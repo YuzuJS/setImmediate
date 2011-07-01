@@ -1,4 +1,4 @@
-READ ME when I'm good and ready.
+Released under MIT license (see MIT-LICENSE.txt)
 
 Reference pages:
 

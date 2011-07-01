@@ -2,15 +2,14 @@
 
 /* setImmediate.js
  *
- * A cross-browser(ish) implimentation of setImmediate and clearImmediate:
+ * A cross-browser implimentation of setImmediate and clearImmediate:
  * https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/setImmediate/Overview.html
  * It should work full speed in Firefox 3+, Internet Explorer 8+, WebKit (Chrome, Safari) and Opera 9.5+.
  * If the browser does NOT support postMessage, it falls back to the slow (i.e. normal) setTimeout/clearTimeout method.
  * In otherwords, setImmediate and clearImmediate is safe in all browsers.
  *
- * by Barnes and Noble, LLC and Donavon West
- * Public Domain.
- * NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
+ * Copyright (c) 2011 Barnesandnoble.com, llc and Donavon West
+ * Released under MIT license (see MIT-LICENSE.txt)
  */
 
 if (!window.setImmediate) {
@@ -24,8 +23,8 @@ if (!window.setImmediate) {
 
 			function handleMessage(event) {
 				if (event.source === window && event.data === messageName) {
-					if (event.stopPropagation) {
-						event.stopPropagation(); // TODO: is this cross browser?
+					if (event.stopPropagation) { //TODO: needed?
+						event.stopPropagation();
 					}
 					if (immediates.length) {
 						var task = immediates.shift();
