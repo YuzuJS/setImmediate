@@ -38,7 +38,7 @@ if (!window.setImmediate) {
 				}
 			}
 			if (window.addEventListener) {
-				window.addEventListener("message", handleMessage);
+				window.addEventListener("message", handleMessage, false);
 			} else {
 				window.attachEvent("message", handleMessage);
 			}
