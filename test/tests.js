@@ -83,4 +83,18 @@
 		clearImmediate(handle);
 		setImmediate(pass, 3);
 	});
+	
+	asyncTest("Does setImmediate yield to subsequent code before executing its callback", 2, function () {
+    var callbackCalled = false;
+    function callback() {
+      callbackCalled = true;
+      
+      ok(true, "The callback was called eventually.");
+      
+      start();
+    }
+    
+    setImmediate(callback);
+    strictEqual(callbackCalled, false, "The callback wasn't called immediately.");
+	});
 }
