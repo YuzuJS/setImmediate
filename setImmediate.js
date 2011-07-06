@@ -6,13 +6,16 @@
  * https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/setImmediate/Overview.html
  * It should work full speed in Firefox 3+, Internet Explorer 8+, WebKit (Chrome, Safari) and Opera 9.5+.
  * If the browser does NOT support postMessage, it falls back to the slow (i.e. normal) setTimeout/clearTimeout method.
- * In otherwords, setImmediate and clearImmediate is safe in all browsers.
+ * In otherwords, setImmediate and clearImmediate are safe in all browsers.
  *
  * Copyright (c) 2011 Barnesandnoble.com, llc and Donavon West
  * Released under MIT license (see MIT-LICENSE.txt)
  */
 
 if (!window.setImmediate) {
+
+  // If supported, we should attach to the prototype of window, since that is where setTimeout et al. live.
+	var attachTo = typeof Object.getPrototypeOf === "function" ? Object.getPrototypeOf(window) : window;
 
 	if (window.postMessage) { // For modern browsers.
 
@@ -41,8 +44,8 @@ if (!window.setImmediate) {
 			} else {
 				window.attachEvent("message", handleMessage);
 			}
-
-			window.setImmediate = function (/*handler[, args]*/) {
+			
+			attachTo.setImmediate = function (/*handler[, args]*/) {
 				var handler = arguments[0];
 				var args = [].slice.call(arguments, 1);
 				var task = { handle: handle, handler: handler, args: args, that: this };
@@ -51,7 +54,7 @@ if (!window.setImmediate) {
 				return handle++;
 			};
 
-			window.clearImmediate = function (handle) {
+			attachTo.clearImmediate = function (handle) {
 				for (var i = 0; i < immediates.length; i++) {
 					if (immediates[i].handle === handle) {
 						immediates.splice(i, 1); //remove the task
