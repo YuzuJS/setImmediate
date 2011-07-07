@@ -14,10 +14,10 @@
 
 if (!window.setImmediate) {
 	(function () {
-  // If supported, we should attach to the prototype of window, since that is where setTimeout et al. live.
-	var attachTo = typeof Object.getPrototypeOf === "function" ? Object.getPrototypeOf(window) : window;
+		// If supported, we should attach to the prototype of window, since that is where setTimeout et al. live.
+		var attachTo = typeof Object.getPrototypeOf === "function" ? Object.getPrototypeOf(window) : window;
 
-	if (window.postMessage) { // For modern browsers.
+		if (window.postMessage) { // For modern browsers.
 			var handle = 1; // Handle MUST be non-zero, says the spec.
 			var immediates = [];
 			var messageName = "com.bn.NobleJS.setImmediate";
@@ -42,7 +42,7 @@ if (!window.setImmediate) {
 			} else {
 				window.attachEvent("message", handleMessage);
 			}
-			
+
 			attachTo.setImmediate = function (/*handler[, args]*/) {
 				var handler = arguments[0];
 				var args = [].slice.call(arguments, 1);
@@ -60,23 +60,21 @@ if (!window.setImmediate) {
 					}
 				}
 			};
-	} else { // Fallback to legacy support for non-postMessage browsers.
+		} else { // Fallback to legacy support for non-postMessage browsers.
+			window.setImmediate = function (/*handler[, args]*/) {
+				var that = this;
+				var handler = arguments[0];
+				var args = [].slice.call(arguments, 1);
+				return setTimeout(function () {
+					if (handler.apply) {
+						handler.apply(that, args);
+					} else {
+						throw ("setImmediate.js: shoot me now! there's no way I'm implimenting an evaluated handler");
+					}
+				}, 0);
+			};
 
-		window.setImmediate = function (/*handler[, args]*/) {
-			var that = this;
-			var handler = arguments[0];
-			var args = [].slice.call(arguments, 1);
-			return setTimeout(function () {
-				if (handler.apply) {
-					handler.apply(that, args);
-				} else {
-					throw ("setImmediate.js: shoot me now! there's no way I'm implimenting an evaluated handler");
-				}
-			}, 0);
-		};
-
-		window.clearImmediate = clearTimeout;
-
-	}
-	}());
+			window.clearImmediate = clearTimeout;
+		}
+	} ());
 }
