@@ -13,13 +13,11 @@
  */
 
 if (!window.setImmediate) {
-
+	(function () {
   // If supported, we should attach to the prototype of window, since that is where setTimeout et al. live.
 	var attachTo = typeof Object.getPrototypeOf === "function" ? Object.getPrototypeOf(window) : window;
 
 	if (window.postMessage) { // For modern browsers.
-
-		(function () {
 			var handle = 1; // Handle MUST be non-zero, says the spec.
 			var immediates = [];
 			var messageName = "com.bn.NobleJS.setImmediate";
@@ -62,8 +60,6 @@ if (!window.setImmediate) {
 					}
 				}
 			};
-		}());
-
 	} else { // Fallback to legacy support for non-postMessage browsers.
 
 		window.setImmediate = function (/*handler[, args]*/) {
@@ -82,4 +78,5 @@ if (!window.setImmediate) {
 		window.clearImmediate = clearTimeout;
 
 	}
+	}());
 }
