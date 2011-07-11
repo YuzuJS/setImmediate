@@ -49,8 +49,8 @@
 			start();		
 		}
 		function fail() {
-			start();
 			ok(true, 'it worked! the handler was correctly never called');
+			start();
 		}
 
 		var timer = setTimeout(fail, 1000);
@@ -59,7 +59,6 @@
 	});
 			
 	asyncTest("does clearImmediate clear a non-sequential setImmediate", 2, function () {
-
 		var y = 1;
 
 		function pass(x) {
