@@ -46,7 +46,7 @@ if (!window.setImmediate) {
 			}
 
 			attachTo.setImmediate = function (handler /*[, args]*/) {
-				var args = [].slice.call(arguments, 1);
+				var args = Array.prototype.slice.call(arguments, 1);
 				var task = { handle: handle, handler: handler, args: args, that: this };
 				immediates.push(task);
 				window.postMessage(messageName, "*");
@@ -64,7 +64,7 @@ if (!window.setImmediate) {
 		} else { // Fallback to legacy support for non-postMessage browsers.
 			attachTo.setImmediate = function (handler /*[, args]*/) {
 				var that = this;
-				var args = [].slice.call(arguments, 1);
+				var args = Array.prototype.slice.call(arguments, 1);
 				return setTimeout(function () {
 					executeTask({ handler:handler, args: args, that: that });
 				}, 0);
