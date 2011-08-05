@@ -19,8 +19,15 @@ if (!window.setImmediate) {
 
 		if (window.postMessage) { // For modern browsers.
 			var handle = 1; // Handle MUST be non-zero, says the spec.
-			var immediates = [];
+	 	 	var immediates = [];
 			var messageName = "com.bn.NobleJS.setImmediate";
+			function executeTask(task) {
+				if (task.handler.apply) {
+					task.handler.apply(task.that, task.args);
+				} else {
+					throw new Error("setImmediate.js: shoot me now! there's no way I'm implementing an evaluated handler!");
+				}
+			}
 
 			function handleMessage(event) {
 				if (event.source === window && event.data === messageName) {
@@ -28,12 +35,7 @@ if (!window.setImmediate) {
 						event.stopPropagation();
 					}
 					if (immediates.length) {
-						var task = immediates.shift();
-						if (task.handler.apply) {
-							task.handler.apply(task.that, task.args);
-						} else {
-							throw new Error("setImmediate.js: shoot me now! there's no way I'm implementing an evaluated handler!");
-						}
+						executeTask(immediates.shift());
 					}
 				}
 			}
@@ -61,20 +63,16 @@ if (!window.setImmediate) {
 				}
 			};
 		} else { // Fallback to legacy support for non-postMessage browsers.
-			window.setImmediate = function (/*handler[, args]*/) {
+			attachTo.setImmediate = function (/*handler[, args]*/) {
 				var that = this;
-				var handler = arguments[0];
+			 	var handler = arguments[0];
 				var args = [].slice.call(arguments, 1);
 				return setTimeout(function () {
-					if (handler.apply) {
-						handler.apply(that, args);
-					} else {
-						throw ("setImmediate.js: shoot me now! there's no way I'm implimenting an evaluated handler");
-					}
+					executeTask({ handler:handler, args: args, that: that });
 				}, 0);
 			};
 
-			window.clearImmediate = clearTimeout;
+			attachTo.clearImmediate = clearTimeout;
 		}
 	} ());
 }
