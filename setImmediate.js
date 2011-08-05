@@ -38,7 +38,7 @@ if (!window.setImmediate) {
 				writable: true,
 				enumerable: true,
 				value: function (handler/*, args */) {
-					var args = [].slice.call(arguments, 1);
+					var args = Array.prototype.slice.call(arguments, 1);
 					var task = { handle: handle, handler: handler, args: args, that: this };
 
 					immediates.push(task);
