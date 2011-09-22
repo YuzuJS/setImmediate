@@ -94,4 +94,14 @@
 		setImmediate(callback);
 		strictEqual(callbackCalled, false, "The callback wasn't called immediately.");
 	});
+
+	if (typeof Worker === "function") {
+		asyncTest("Does setImmediate work inside a web worker", 1, function () {
+			var worker = new Worker("worker.js");
+			worker.addEventListener("message", function (event) {
+				strictEqual(event.data, "TEST", "The web worker used setImmediate to pass data back to the main script");
+				start();
+			}, false);
+		});
+	}
 }
