@@ -1,7 +1,9 @@
 ﻿function runAll() {
-	asyncTest("does setImmediate call the handler", 1, function () {
+	asyncTest("Does setImmediate call the handler", 1, function () {
 		function pass() {
-			if (timer) clearTimeout(timer);
+			if (timer) {
+				clearTimeout(timer);
+			}
 			ok(true, 'it worked! the handler was called');
 			start();		
 		}
@@ -14,10 +16,8 @@
 		setImmediate(pass);
 	});
 
-	asyncTest("does setImmediate call the handler WITH one argument", 1, function () {
-		var timer;
+	asyncTest("Does setImmediate call the handler WITH one argument", 1, function () {
 		function pass(abc) {
-			if (timer) {clearTimeout(timer);}
 			if (abc === "abc") {
 				ok(true, 'it worked! the handler was called with the correct arguments');
 			} else {
@@ -28,10 +28,8 @@
 		setImmediate(pass, "abc");
 	});
 
-	asyncTest("does setImmediate call the handler WITH two arguments", 1, function () {
-		var timer;
+	asyncTest("Does setImmediate call the handler WITH two arguments", 1, function () {
 		function pass(abc, num) {
-			if (timer) {clearTimeout(timer);}
 			if (abc === "abc" && num === 123) {
 				ok(true, 'it worked! the handler was called with the correct arguments');
 			} else {
@@ -42,9 +40,9 @@
 		setImmediate(pass, "abc", 123);
 	});
 
-	asyncTest("does clearImmediate clear a setImmediate that was just set", 1, function () {
+	asyncTest("Does clearImmediate clear a setImmediate that was just set", 1, function () {
 		function pass() {
-			if (timer) clearTimeout(timer);
+			clearTimeout(timer);
 			ok(false, 'FAILED! the handler was called');	
 			start();		
 		}
@@ -58,8 +56,7 @@
 		clearImmediate(handle);
 	});
 			
-	asyncTest("does clearImmediate clear a non-sequential setImmediate", 2, function () {
-
+	asyncTest("Does clearImmediate clear a non-sequential setImmediate", 2, function () {
 		var y = 1;
 
 		function pass(x) {
@@ -68,7 +65,7 @@
 				strictEqual(y, 1, "setImmediate(pass, 1)");
 				break;
 			case 2:
-				ok(false, 'oops! should not be here. x={0} y={1}'.format(x,y));
+				ok(false, 'oops! should not be here. x=' + x + ' y=' + y);
 				break;
 			case 3:
 				strictEqual(y, 2, "setImmediate(pass, 3)");
@@ -85,16 +82,26 @@
 	});
 	
 	asyncTest("Does setImmediate yield to subsequent code before executing its callback", 2, function () {
-    var callbackCalled = false;
-    function callback() {
-      callbackCalled = true;
-      
-      ok(true, "The callback was called eventually.");
-      
-      start();
-    }
-    
-    setImmediate(callback);
-    strictEqual(callbackCalled, false, "The callback wasn't called immediately.");
+		var callbackCalled = false;
+		function callback() {
+		  callbackCalled = true;
+	  
+		  ok(true, "The callback was called eventually.");
+	  
+		  start();
+		}
+	
+		setImmediate(callback);
+		strictEqual(callbackCalled, false, "The callback wasn't called immediately.");
 	});
+
+	if (typeof Worker === "function") {
+		asyncTest("Does setImmediate work inside a web worker", 1, function () {
+			var worker = new Worker("worker.js");
+			worker.addEventListener("message", function (event) {
+				strictEqual(event.data, "TEST", "The web worker used setImmediate to pass data back to the main script");
+				start();
+			}, false);
+		});
+	}
 }
