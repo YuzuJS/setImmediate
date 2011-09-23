@@ -11,23 +11,27 @@ asyncTest = true;
 
 
 var delays = [];
+var w = null;
 
 function finish() {
 
-  if (delays.length === 2 + (window.Worker ? 2 : 0)) {
+  if (delays.length > 1 + (w ? 2 : 0)) {
     document.body.innerHTML = (delays.join('<br />'));
   }
 }
 
-if (window.Worker) {
-  var w = new Worker('webworker.js?' + Math.random());
-  w.onmessage = function (event) {
-    delays.push('from Worker: ' + event.data);
-    finish();
-  };
-  w.postMessage('');
+try {
+  if (window.Worker) {
+    w = new Worker('webworker.js?' + Math.random());
+    w.onmessage = function (event) {
+      delays.push('from Worker: ' + event.data);
+      finish();
+    };
+    w.postMessage('');
+  }
+} catch(e) {
+  // security error (Webkit)
 }
-
 
 function test(func, n, callback) {
   var i = -1,
@@ -56,5 +60,7 @@ function test(func, n, callback) {
   });
 
 }());
+
+
 
 </script>
