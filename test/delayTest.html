@@ -1,0 +1,60 @@
+<script src="../setImmediate.js"></script>
+<script>
+
+var asyncTest = false;
+setImmediate(function () {
+  if (!asyncTest) {
+    alert('async test failed!!!');
+  }
+});
+asyncTest = true;
+
+
+var delays = [];
+
+function finish() {
+
+  if (delays.length === 2 + (window.Worker ? 2 : 0)) {
+    document.body.innerHTML = (delays.join('<br />'));
+  }
+}
+
+if (window.Worker) {
+  var w = new Worker('webworker.js?' + Math.random());
+  w.onmessage = function (event) {
+    delays.push('from Worker: ' + event.data);
+    finish();
+  };
+  w.postMessage('');
+}
+
+
+function test(func, n, callback) {
+  var i = -1,
+      t = +new Date();
+  function onTimeout() {
+    i++;
+    if (i < n) {
+      func(onTimeout, 0);
+    } else {
+      callback(+new Date() - t);
+    }
+  }
+  onTimeout();
+}
+
+(function () {
+  var t = +new Date(), d1, d2;
+  
+  test(setTimeout, 100, function (delay) {
+    delays.push('delay with setTimeout: ' + delay + ' ms');
+    finish();
+    test(setImmediate, 100, function (delay) {
+      delays.push('delay with setImmediate: ' + delay + ' ms');
+      finish();
+    }, 0);
+  });
+
+}());
+
+</script>
