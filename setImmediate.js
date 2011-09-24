@@ -17,69 +17,70 @@
 
 (function (global) {
 
-  var immediates = {},
+  var immediates = [],
+      syncronouse = false,
+      executed = false,
       MESSAGE_NAME = 'com.bn.NobleJS.setImmediate';
 
   function clearImmediate(id) {
-    var x;
-    if (immediates.hasOwnProperty(id)) {
-      x = immediates[id];
-      if (x.hasOwnProperty('msSetImmediateId') && global.msClearImmediate) {
-        global.msClearImmediate(x.msSetImmediateId);
+    var i, x = [];
+    for (i = 0; i < immediates.length; i++) {
+      if (immediates[i].id !== id) {
+        x.push(immediates[i]);
       }
-      if (x.port) {
-        x.port.onmessage = null;
-      }
-      if (x.listener) {
-        global.removeEventListener('message', x.listener, false);
-      }
-      clearTimeout(id);
-      delete immediates[id];
     }
+    immediates = x;
+  }
+
+  function onTimeout() {
+    if (!syncronouse && immediates.length) {
+      if (!executed) {
+        executed = true;
+        var x = immediates.shift();
+        try {
+          x.callback.apply(global, x.args);
+        } catch (e) {
+          executed = false;
+          throw e;
+        }
+        executed = false;
+      } else {
+        setTimeout(onTimeout, 0);
+      }
+    }
+  }
+
+  if (global.addEventListener && global.postMessage && !global.importScripts) {
+    global.addEventListener('message', function (event) {
+      if (event.source === global && event.data === MESSAGE_NAME) {
+        onTimeout();
+      }
+    }, false);
   }
 
   if (!global.setImmediate) {
     global.setImmediate = function (callback) {
-      var syncronouse = true,
-          args = [].slice.call(arguments, 1),
-          channel, id;
+      var x = {
+        args: [].slice.call(arguments, 1),
+        callback: callback
+      }, channel;
 
-      function onTimeout() {
-        if (!syncronouse) {
-          clearImmediate(id);
+      syncronouse = true;
+      immediates.push(x);
 
-          callback.apply(global, args);
-        }
-      }
-
-      id = setTimeout(onTimeout);
-      immediates[id] = {};
-
+      x.id = setTimeout(onTimeout, 0);
       if (global.msSetImmediate) {
-        immediates[id].msSetImmediateId = global.msSetImmediate(onTimeout);
-      }
-
-      if (global.MessageChannel) {
+        global.msSetImmediate(onTimeout);
+      } else if (global.MessageChannel) {
         channel = new global.MessageChannel();
         channel.port1.onmessage = onTimeout;
         channel.port2.postMessage('');
-        immediates[id].port = channel.port1;
-      }
-
-      // The test against importScripts prevents this implementation from being installed inside a web worker,
-      // where postMessage means something completely different and can't be used for this purpose.
-      if (global.addEventListener && global.postMessage && !global.importScripts) {
-        immediates[id].listener = function (event) {
-          if (event.source === global && event.data === MESSAGE_NAME + id) {
-            onTimeout();
-          }
-        };
-        global.addEventListener('message', immediates[id].listener, false);
-        global.postMessage(MESSAGE_NAME + id, '*');
+      } else if (global.addEventListener && global.postMessage && !global.importScripts) {
+        global.postMessage(MESSAGE_NAME, '*');
       }
 
       syncronouse = false;
-      return id;
+      return x.id;
     };
 
     global.clearImmediate = clearImmediate;
