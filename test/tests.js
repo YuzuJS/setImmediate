@@ -104,4 +104,45 @@
 			}, false);
 		});
 	}
+
+	asyncTest("Execution order for setImmediate via postMessage", 1, function () {
+        var orderOfExecution = '';
+        var tmp = setImmediate(function () {
+          
+        });
+        clearImmediate(tmp);
+
+        window.onmessage = function (event) {
+          event = event || window.event;
+          if (event.data === 'some other message') {
+            orderOfExecution += '1';
+            if (orderOfExecution.length === 2) {
+              strictEqual(orderOfExecution === '12', true, "Execution order is wrong");
+              start();
+            }
+          }
+        };
+        window.postMessage('some other message', '*');
+
+        setImmediate(function () {
+          orderOfExecution += '2';
+          if (orderOfExecution.length === 2) {
+            strictEqual(orderOfExecution === '12', true, "Execution order is wrong");
+            start();
+          }
+        });
+
+	});
+
+
+    asyncTest("Execution order test", 1, function () {
+       var j = 0;
+       setImmediate(function () {
+         j = 1;
+       });
+       setTimeout(function () {
+         strictEqual(!!j, true, "Execution order is wrong");
+         start();
+       }, 0);
+    });
 }

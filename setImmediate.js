@@ -1,4 +1,4 @@
-﻿/*jshint curly: true, eqeqeq: true, immed: true, newcap: true, noarg: true, nonew: true, undef: true, white: true, trailing: true */
+/*jshint curly: true, eqeqeq: true, immed: true, newcap: true, noarg: true, nonew: true, undef: true, white: true, trailing: true */
 
 /* setImmediate.js
  *
@@ -16,146 +16,72 @@
  */
 
 (function (global) {
-    function executeHandler(handler, thisObj, args) {
-        if (handler.apply) {
-            handler.apply(thisObj, args);
-        } else {
-            throw new Error("setImmediate.js: shoot me now! there's no way I'm implementing an evaluated handler!");
+
+  var immediates = {},
+      MESSAGE_NAME = 'com.bn.NobleJS.setImmediate';
+
+  function clearImmediate(id) {
+    var x;
+    if (immediates.hasOwnProperty(id)) {
+      x = immediates[id];
+      if (x.hasOwnProperty('msSetImmediateId') && global.msClearImmediate) {
+        global.msClearImmediate(x.msSetImmediateId);
+      }
+      if (x.port) {
+        x.port.onmessage = null;
+      }
+      if (x.listener) {
+        global.removeEventListener('message', x.listener, false);
+      }
+      clearTimeout(id);
+      delete immediates[id];
+    }
+  }
+
+  if (!global.setImmediate) {
+    global.setImmediate = function (callback) {
+      var syncronouse = true,
+          args = [].slice.call(arguments, 1),
+          channel, id;
+
+      function onTimeout() {
+        if (!syncronouse) {
+          clearImmediate(id);
+
+          callback.apply(global, args);
         }
-    }
+      }
 
-    function hasMicrosoftImplementation() {
-        return !!(global.msSetImmediate && global.msClearImmediate);
-    }
+      id = setTimeout(onTimeout);
+      immediates[id] = {};
 
-    function canUseMessageChannel() {
-        return !!global.MessageChannel;
-    }
+      if (global.msSetImmediate) {
+        immediates[id].msSetImmediateId = global.msSetImmediate(onTimeout);
+      }
 
-    function canUsePostMessage() {
-        // The test against importScripts prevents this implementation from being installed inside a web worker,
-        // where postMessage means something completely different and can't be used for this purpose.
+      if (global.MessageChannel) {
+        channel = new global.MessageChannel();
+        channel.port1.onmessage = onTimeout;
+        channel.port2.postMessage('');
+        immediates[id].port = channel.port1;
+      }
 
-        if (!global.addEventListener || !global.postMessage || global.importScripts) {
-            return false;
-        }
-
-        var postMessageIsAsynchronous = true;
-        var oldOnMessage = window.onmessage;
-        window.onmessage = function () {
-            postMessageIsAsynchronous = false;
+      // The test against importScripts prevents this implementation from being installed inside a web worker,
+      // where postMessage means something completely different and can't be used for this purpose.
+      if (global.addEventListener && global.postMessage && !global.importScripts) {
+        immediates[id].listener = function (event) {
+          if (event.source === global && event.data === MESSAGE_NAME + id) {
+            onTimeout();
+          }
         };
-        window.postMessage("", "*");
-        window.onmessage = oldOnMessage;
+        global.addEventListener('message', immediates[id].listener, false);
+        global.postMessage(MESSAGE_NAME + id, '*');
+      }
 
-        return postMessageIsAsynchronous;
-    }
+      syncronouse = false;
+      return id;
+    };
 
-    function installMicrosoftImplementation(attachTo) {
-        attachTo.setImmediate = global.msSetImmediate;
-        attachTo.clearImmediate = global.msClearImmediate;
-    }
-
-    function installMessageChannelImplementation(attachTo) {
-        var currentHandle = 1; // Handle MUST be non-zero, says the spec.
-        var executingHandles = {}; // Used as a "set", i.e. keys are handles and values don't matter.
-
-        attachTo.setImmediate = function (handler/*[, args]*/) {
-            var thisObj = this;
-            var args = Array.prototype.slice.call(arguments, 1);
-
-            currentHandle++;
-
-            // Create a channel and immediately post a message to it with the current handle.
-            var channel = new global.MessageChannel();
-            channel.port1.onmessage = function (event) {
-                var theHandle = event.data;
-
-                // The message posted includes the handle; make sure that handle hasn't been cleared.
-                if (executingHandles.hasOwnProperty(theHandle)) {
-                    delete executingHandles[theHandle];
-                    executeHandler(handler, thisObj, args);
-                }
-            };
-            channel.port2.postMessage(currentHandle);
-
-            // Add this handle to the executingHandles set, then return it.
-            executingHandles[currentHandle] = true;
-            return currentHandle;
-        };
-
-        attachTo.clearImmediate = function (handle) {
-            // Clear a handle by removing it from the executingHandles set, so that when the message is received,
-            // nothing happens.
-            delete executingHandles[handle];
-        };
-    }
-
-    function installPostMessageImplementation(attachTo) {
-        var currentHandle = 1; // Handle MUST be non-zero, says the spec.
-        var executingHandles = {}; // Used as a "set", i.e. keys are handles and values don't matter.
-        var MESSAGE_NAME = "com.bn.NobleJS.setImmediate";
-
-        function clearImmediate(handle) {
-            if (executingHandles.hasOwnProperty(handle)) {
-                global.removeEventListener("message", executingHandles[handle], false);
-                delete executingHandles[handle];
-            }
-        }
-
-        attachTo.clearImmediate = clearImmediate;
-
-        attachTo.setImmediate = function (handler/*[, args]*/) {
-            var thisObj = this;
-            var args = Array.prototype.slice.call(arguments, 1);
-
-            currentHandle++;
-            var handle = currentHandle;
-
-            executingHandles[handle] = function (event) {
-                if (event.source === global && event.data === MESSAGE_NAME + handle) {
-                    clearImmediate(handle);
-                    executeHandler(handler, thisObj, args);
-                }
-            };
-
-            global.addEventListener("message", executingHandles[handle], false);
-            global.postMessage(MESSAGE_NAME + handle, "*");
-            return handle;
-        };
-    }
-
-    function installSetTimeoutImplementation(attachTo) {
-        attachTo.setImmediate = function (handler /*[, args]*/) {
-            var thisObj = this;
-            var args = Array.prototype.slice.call(arguments, 1);
-
-            return global.setTimeout(function () {
-                executeHandler(handler, thisObj, args);
-            }, 0);
-        };
-
-        attachTo.clearImmediate = global.clearTimeout;
-    }
-
-    if (!global.setImmediate) {
-        // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
-        var attachTo = typeof Object.getPrototypeOf === "function" && "setTimeout" in Object.getPrototypeOf(global) ?
-                          Object.getPrototypeOf(global)
-                        : global;
-
-        if (hasMicrosoftImplementation()) {
-            // For IE10
-            installMicrosoftImplementation(attachTo);
-        } else if (canUseMessageChannel()) {
-            // For super-modern browsers; also works inside web workers.
-            installMessageChannelImplementation(attachTo);
-        } else if (canUsePostMessage()) {
-            // For modern browsers.
-        	installPostMessageImplementation(attachTo);
-        } else {
-            // For older browsers.
-            installSetTimeoutImplementation(attachTo);
-        }
-    }
+    global.clearImmediate = clearImmediate;
+  }
 }(this));
