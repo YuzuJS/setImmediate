@@ -36,7 +36,7 @@
         // The test against importScripts prevents this implementation from being installed inside a web worker,
         // where postMessage means something completely different and can't be used for this purpose.
 
-        if (!global.postMessage || global.importScripts) {
+        if (!global.addEventListener || !global.postMessage || global.importScripts) {
             return false;
         }
 
@@ -92,45 +92,36 @@
     }
 
     function installPostMessageImplementation(attachTo) {
-        var handle = 1; // Handle MUST be non-zero, says the spec.
-        var immediates = [];
+        var currentHandle = 1; // Handle MUST be non-zero, says the spec.
+        var executingHandles = {}; // Used as a "set", i.e. keys are handles and values don't matter.
         var MESSAGE_NAME = "com.bn.NobleJS.setImmediate";
 
-        function handleMessage(event) {
-            if (event.source === global && event.data === MESSAGE_NAME) {
-                if (event.stopPropagation) {	// IE8 does not have this
-                    event.stopPropagation();
-                }
-
-                if (immediates.length > 0) {
-                    var immediate = immediates.shift();
-                    executeHandler(immediate.handler, immediate.thisObj, immediate.args);
-                }
+        function clearImmediate(handle) {
+            if (executingHandles.hasOwnProperty(handle)) {
+                global.removeEventListener("message", executingHandles[handle], false);
+                delete executingHandles[handle];
             }
         }
 
-        if (global.addEventListener) {
-            global.addEventListener("message", handleMessage, false);
-        } else {
-            global.attachEvent("onmessage", handleMessage);
-        }
+        attachTo.clearImmediate = clearImmediate;
 
         attachTo.setImmediate = function (handler/*[, args]*/) {
+            var thisObj = this;
             var args = Array.prototype.slice.call(arguments, 1);
-            var task = { handle: handle, handler: handler, args: args, thisObj: this };
-            immediates.push(task);
 
-            global.postMessage(MESSAGE_NAME, "*");
-            return handle++;
-        };
+            currentHandle++;
+            var handle = currentHandle;
 
-        attachTo.clearImmediate = function (handle) {
-            for (var i = 0; i < immediates.length; i++) {
-                if (immediates[i].handle === handle) {
-                    immediates.splice(i, 1); // Remove the task
-                    break;
+            executingHandles[handle] = function (event) {
+                if (event.source === global && event.data === MESSAGE_NAME + handle) {
+                    clearImmediate(handle);
+                    executeHandler(handler, thisObj, args);
                 }
-            }
+            };
+
+            global.addEventListener("message", executingHandles[handle], false);
+            global.postMessage(MESSAGE_NAME + handle, "*");
+            return handle;
         };
     }
 
