@@ -7,16 +7,10 @@
 	<script type="text/javascript" src="../setImmediate.js"></script>
 
 	<script type="text/javascript" src="tests.js"></script>
-	<script type="text/javascript" src="lib/jquery-1.6.1.js"></script>
-	<!-- qunit includes -->
+
+	<!-- QUnit includes -->
 	<link rel="stylesheet" href="lib/qunit.css" type="text/css" media="screen" />
 	<script type="text/javascript" src="lib/qunit.js"></script>
-
-	<script>
-		$(document).ready(function(){
-			runAll();
-		});
-	</script>
 </head>  
 <body>
 	<section id="qunit">
@@ -27,5 +21,9 @@
 		<ol id="qunit-tests"></ol>
 		<div id="qunit-fixture"></div>
 	</section>
+
+	<script>
+		runAll();
+	</script>
 </body>
 </html>

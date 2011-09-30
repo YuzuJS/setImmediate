@@ -1,7 +1,7 @@
 ﻿function runAll() {
     asyncTest("When a handler is queued with setImmediate, it executes eventually", 1, function () {
         setImmediate(function () {
-            ok(true, "The handler is called.");
+            ok(true, "The handler is called eventually.");
             start();
         });
     });
@@ -53,7 +53,7 @@
         clearImmediate(handle);
 
         setTimeout(function () {
-            ok(!handlerCalled, "After one second, the handler is not called.");
+            ok(!handlerCalled, "After one second, the handler has not been not called.");
             start();
         }, 1000);
     });
