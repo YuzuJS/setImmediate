@@ -1,21 +1,23 @@
 ﻿/*jshint curly: true, eqeqeq: true, immed: true, newcap: true, noarg: true, nonew: true, undef: true, white: true, trailing: true, evil: true */
 
-/* setImmediate.js
- *
- * A cross-browser setImmediate and clearImmediate:
+/* A cross-browser setImmediate and clearImmediate:
  * https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/setImmediate/Overview.html
  * Uses one of the following implementations:
  *  - Native msSetImmediate/msClearImmediate in IE10
  *  - MessageChannel in supporting (very recent) browsers: advantageous because it works in a web worker context
  *  - postMessage in Firefox 3+, Internet Explorer 9+, WebKit, and Opera 9.5+ (except where MessageChannel is used)
+ *  - <script> element onreadystatechange in Internet Explorer 6–8
  *  - setTimeout(..., 0) in all other browsers
  * In other words, setImmediate and clearImmediate are safe in all browsers.
  *
- * Copyright © 2011 Barnesandnoble.com llc, Donavon West, and Domenic Denicola
- * Released under MIT license (see MIT-LICENSE.txt)
+ * Copyright © 2011 Barnesandnoble.com llc, Donavon West, and Domenic Denicola.
+ * Special thanks to Yaffle (https://github.com/Yaffle) for his bug reports, fork, pull requests, and general
+ * discussion, all of which have made setImmediate.js much better than its original form.
+ * 
+ * Released under the MIT license (see MIT-LICENSE.txt).
  */
 
-(function (global) {
+(function (global, undefined) {
 	"use strict";
 
     var tasks = (function () {
@@ -86,6 +88,11 @@
         global.onmessage = oldOnMessage;
 
         return postMessageIsAsynchronous;
+		return false;
+    }
+
+    function canUseReadyStateChange() {
+    	return "document" in global && "onreadystatechange" in global.document.createElement("script");
     }
 
     function aliasMicrosoftImplementation(attachTo) {
@@ -97,7 +104,7 @@
         attachTo.setImmediate = function () {
             var handle = tasks.addFromSetImmediateArguments(arguments);
 
-            // Create a channel and immediately post a message to it with the current handle.
+            // Create a channel and immediately post a message to it with the handle.
             var channel = new global.MessageChannel();
             channel.port1.onmessage = function () {
                 tasks.runIfPresent(handle);
@@ -145,6 +152,26 @@
         };
     }
 
+    function installReadyStateChangeImplementation(attachTo) {
+    	attachTo.setImmediate = function () {
+			var handle = tasks.addFromSetImmediateArguments(arguments);
+
+			// Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
+			// into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
+			var scriptEl = document.createElement("script");
+			scriptEl.onreadystatechange = function () {
+				tasks.runIfPresent(handle);
+
+				scriptEl.onreadystatechange = null;
+				scriptEl.parentNode.removeChild(scriptEl);
+				scriptEl = null;
+			};
+			document.documentElement.appendChild(scriptEl);
+
+			return handle;
+    	};
+    }
+
     function installSetTimeoutImplementation(attachTo) {
         attachTo.setImmediate = function () {
             var handle = tasks.addFromSetImmediateArguments(arguments);
@@ -168,13 +195,16 @@
             aliasMicrosoftImplementation(attachTo);
         } else {
             if (canUseMessageChannel()) {
-                // For super-modern browsers; also works inside web workers.
+                // For super-modern browsers; also works inside web workers
                 installMessageChannelImplementation(attachTo);
             } else if (canUsePostMessage()) {
-                // For modern browsers.
+                // For modern browsers
                 installPostMessageImplementation(attachTo);
+			} else if (canUseReadyStateChange()) {
+				// For IE 6–8
+				installReadyStateChangeImplementation(attachTo);
             } else {
-                // For older browsers.
+                // For older browsers
                 installSetTimeoutImplementation(attachTo);
             }
 
