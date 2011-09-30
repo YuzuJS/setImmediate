@@ -18,7 +18,7 @@
  */
 
 (function (global, undefined) {
-	"use strict";
+    "use strict";
 
     var tasks = (function () {
         function Task(handler, args) {
@@ -28,7 +28,7 @@
         Task.prototype.run = function () {
             // See steps in section 5 of the spec.
             if (typeof this.handler === "function") {
-                // Choice of `thisArg` is not in the setImmediate spec; undefined is specified in setTimeout spec though:
+                // Choice of `thisArg` is not in the setImmediate spec; `undefined` is in the setTimeout spec though:
                 // http://www.whatwg.org/specs/web-apps/current-work/multipage/timers.html
                 this.handler.apply(undefined, this.args);
             } else {
@@ -39,6 +39,7 @@
 
         var nextHandle = 1; // Spec says greater than zero
         var tasksByHandle = {};
+        var currentlyRunningATask = false;
 
         return {
             addFromSetImmediateArguments: function (args) {
@@ -51,10 +52,25 @@
                 return thisHandle;
             },
             runIfPresent: function (handle) {
-                var task = tasksByHandle[handle];
-                if (task) {
-                    task.run();
-                    delete tasksByHandle[handle];
+                // From the spec: "Wait until any invocations of this algorithm started before this one have completed."
+                // So if we're currently running a task, we'll need to delay this invocation.
+                if (!currentlyRunningATask) {
+                    var task = tasksByHandle[handle];
+                    if (task) {
+                        currentlyRunningATask = true;
+                        try {
+                            task.run();
+                        } finally {
+                            delete tasksByHandle[handle];
+                            currentlyRunningATask = false;
+                        }
+                    }
+                } else {
+                    // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a 
+                    // "too much recursion" error.
+                    global.setTimeout(function () {
+                        tasks.runIfPresent(handle);
+                    }, 0);
                 }
             },
             remove: function (handle) {
@@ -88,11 +104,11 @@
         global.onmessage = oldOnMessage;
 
         return postMessageIsAsynchronous;
-		return false;
+        return false;
     }
 
     function canUseReadyStateChange() {
-    	return "document" in global && "onreadystatechange" in global.document.createElement("script");
+        return "document" in global && "onreadystatechange" in global.document.createElement("script");
     }
 
     function aliasMicrosoftImplementation(attachTo) {
@@ -153,23 +169,23 @@
     }
 
     function installReadyStateChangeImplementation(attachTo) {
-    	attachTo.setImmediate = function () {
-			var handle = tasks.addFromSetImmediateArguments(arguments);
+        attachTo.setImmediate = function () {
+            var handle = tasks.addFromSetImmediateArguments(arguments);
 
-			// Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
-			// into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
-			var scriptEl = document.createElement("script");
-			scriptEl.onreadystatechange = function () {
-				tasks.runIfPresent(handle);
+            // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
+            // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
+            var scriptEl = document.createElement("script");
+            scriptEl.onreadystatechange = function () {
+                tasks.runIfPresent(handle);
 
-				scriptEl.onreadystatechange = null;
-				scriptEl.parentNode.removeChild(scriptEl);
-				scriptEl = null;
-			};
-			document.documentElement.appendChild(scriptEl);
+                scriptEl.onreadystatechange = null;
+                scriptEl.parentNode.removeChild(scriptEl);
+                scriptEl = null;
+            };
+            document.documentElement.appendChild(scriptEl);
 
-			return handle;
-    	};
+            return handle;
+        };
     }
 
     function installSetTimeoutImplementation(attachTo) {
@@ -200,9 +216,9 @@
             } else if (canUsePostMessage()) {
                 // For modern browsers
                 installPostMessageImplementation(attachTo);
-			} else if (canUseReadyStateChange()) {
-				// For IE 6–8
-				installReadyStateChangeImplementation(attachTo);
+            } else if (canUseReadyStateChange()) {
+                // For IE 6–8
+                installReadyStateChangeImplementation(attachTo);
             } else {
                 // For older browsers
                 installSetTimeoutImplementation(attachTo);

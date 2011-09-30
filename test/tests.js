@@ -77,11 +77,29 @@
         }, 1000);
     });
 
+    asyncTest("When the handler launches a modal dialog, any subsequently queued handlers are not called until after the modal dialog closes", 1, function () {
+        // Try to launch the less-annoying self-closing-window modal dialog; if that's not an option, fall back to alert.
+        var showTheDialog = window.showModalDialog
+            ? function () { window.showModalDialog("selfClose.htm") }
+            : function () { window.alert("Please press OK to continue the test; we needed a modal dialog."); }
+
+        var dialogClosed = false;
+        setImmediate(function () {
+            showTheDialog();
+            dialogClosed = true;
+        });
+
+        setImmediate(function () {
+            ok(dialogClosed, "The dialog closes before the subsequent setImmediate handler is called.");
+            start();
+        });
+    });
+
     if (typeof Worker === "function") {
         asyncTest("When inside a web worker context, setImmediate calls the passed handler", 1, function () {
             var worker = new Worker("worker.js");
             worker.addEventListener("message", function (event) {
-                strictEqual(event.data, "TEST", "The web worker used setImmediate to pass data back to the main script");
+                strictEqual(event.data, "TEST", "The web worker's invocation of setImmediate executes the passed handler, passing data back to the main script.");
                 start();
             }, false);
         });
