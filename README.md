@@ -25,7 +25,7 @@ Reference pages
 ---------------
 
  * [Efficient Script Yielding W3C Editor's Draft][spec]
- * [public-web-perf@w3.org mailing list post introducing the specification][list-post]
+ * [W3C mailing list post introducing the specification][list-post]
  * [IE Test Drive demo][demo]
  * [Introductory blog post by Nicholas C. Zakas][ncz]
 
