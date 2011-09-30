@@ -1,102 +1,84 @@
 ﻿function runAll() {
-	asyncTest("Does setImmediate call the handler", 1, function () {
-		function pass() {
-			if (timer) {
-				clearTimeout(timer);
-			}
-			ok(true, 'it worked! the handler was called');
-			start();		
-		}
-		function fail() {
-			ok(false, 'FAILED! the handler was never called');	
-			start();		
-		}
-
-		var timer = setTimeout(fail, 1000);
-		setImmediate(pass);
-	});
-
-	asyncTest("Does setImmediate call the handler WITH one argument", 1, function () {
-		function pass(abc) {
-			if (abc === "abc") {
-				ok(true, 'it worked! the handler was called with the correct arguments');
-			} else {
-				ok(false, 'the handler was called but the arguments were incorrect');
-			}
-			start();		
-		}
-		setImmediate(pass, "abc");
-	});
-
-	asyncTest("Does setImmediate call the handler WITH two arguments", 1, function () {
-		function pass(abc, num) {
-			if (abc === "abc" && num === 123) {
-				ok(true, 'it worked! the handler was called with the correct arguments');
-			} else {
-				ok(false, 'the handler was called but the arguments were incorrect');
-			}
-			start();		
-		}
-		setImmediate(pass, "abc", 123);
-	});
-
-	asyncTest("Does clearImmediate clear a setImmediate that was just set", 1, function () {
-		function pass() {
-			clearTimeout(timer);
-			ok(false, 'FAILED! the handler was called');	
-			start();		
-		}
-		function fail() {
+	asyncTest("When a handler is queued with setImmediate, it executes eventually", 1, function () {
+		setImmediate(function () {
+			ok(true, "The handler is called.");
 			start();
-			ok(true, 'it worked! the handler was correctly never called');
-		}
-
-		var timer = setTimeout(fail, 1000);
-		var handle = setImmediate(pass);
-		clearImmediate(handle);
+		});
 	});
-			
-	asyncTest("Does clearImmediate clear a non-sequential setImmediate", 2, function () {
-		var y = 1;
 
-		function pass(x) {
-			switch (x) {
-			case 1:
-				strictEqual(y, 1, "setImmediate(pass, 1)");
-				break;
-			case 2:
-				ok(false, 'oops! should not be here. x=' + x + ' y=' + y);
-				break;
-			case 3:
-				strictEqual(y, 2, "setImmediate(pass, 3)");
-				start();
-				break;
-			}
-			y++;
+	asyncTest("When a handler is queued with setImmediate, it yields so that subsequent code executes first", 2, function () {
+		var handlerCalled = false;
+		function handler() {
+			handlerCalled = true;
+
+			ok(true, "The handler is called eventually.");
+			start();
 		}
 
-		setImmediate(pass, 1);
-		var handle = setImmediate(pass, 2);
-		clearImmediate(handle);
-		setImmediate(pass, 3);
+		setImmediate(handler);
+		ok(!handlerCalled, "Simply calling setImmediate does not call the handler immediately.");
 	});
-	
-	asyncTest("Does setImmediate yield to subsequent code before executing its callback", 2, function () {
-		var callbackCalled = false;
-		function callback() {
-		  callbackCalled = true;
-	  
-		  ok(true, "The callback was called eventually.");
-	  
-		  start();
+
+	asyncTest("When given the handler and one argument, setImmediate calls the handler with that argument", 1, function () {
+		var expectedArg = {};
+
+		function handler(actualArg) {
+			strictEqual(actualArg, expectedArg, "The argument passed to the handler is the same object as was passed to setImmediate as the second argument.");
+			start();
 		}
-	
-		setImmediate(callback);
-		strictEqual(callbackCalled, false, "The callback wasn't called immediately.");
+
+		setImmediate(handler, expectedArg);
+	});
+
+	asyncTest("When given the handler and two arguments, setImmediate calls the handler with those arguments", 2, function () {
+		var expectedArg1 = {};
+		var expectedArg2 = {};
+
+		function handler(actualArg1, actualArg2) {
+			strictEqual(actualArg1, expectedArg1, "The first argument passed to the handler is the same object as was passed to setImmediate as the second argument.");
+			strictEqual(actualArg2, expectedArg2, "The second argument passed to the handler is the same object as was passed to setImmediate as the third argument.");
+			start();
+		}
+
+		setImmediate(handler, expectedArg1, expectedArg2);
+	});
+
+	asyncTest("When setImmediate is called, calling clearImmediate on the next line prevents the handler from being called (at least for within the next second)", 1, function () {
+		var handlerCalled = false;
+		function handler() {
+			handlerCalled = true;
+		}
+
+		var handle = setImmediate(handler);
+		clearImmediate(handle);
+
+		setTimeout(function () {
+			ok(!handlerCalled, "After one second, the handler is not called.");
+			start();
+		}, 1000);
+	});
+
+	asyncTest("When multiple handlers are queued with setImmediate, calling clearImmediate on some of the handles clears those tasks but no others", 1, function () {
+		var expectedArgs = ["A", "D"];
+		var recordedArgs = [];
+		function handler(arg) {
+			recordedArgs.push(arg);
+		}
+
+		setImmediate(handler, "A");
+		clearImmediate(setImmediate(handler, "B"));
+		var handle = setImmediate(handler, "C");
+		setImmediate(handler, "D");
+		clearImmediate(handle);
+
+		setTimeout(function () {
+			deepEqual(recordedArgs, expectedArgs, "Only the non-cleared invocations of the handler occurr.");
+			start();
+		}, 1000);
 	});
 
 	if (typeof Worker === "function") {
-		asyncTest("Does setImmediate work inside a web worker", 1, function () {
+		asyncTest("When inside a web worker context, setImmediate calls the passed handler", 1, function () {
 			var worker = new Worker("worker.js");
 			worker.addEventListener("message", function (event) {
 				strictEqual(event.data, "TEST", "The web worker used setImmediate to pass data back to the main script");
