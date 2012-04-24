@@ -125,7 +125,9 @@
             channel.port1.onmessage = function () {
                 tasks.runIfPresent(handle);
             };
-            channel.port2.postMessage();
+
+            // IE10 requires a message, so send `null`.
+            channel.port2.postMessage(null);
 
             return handle;
         };
