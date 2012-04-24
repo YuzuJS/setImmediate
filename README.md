@@ -2,7 +2,7 @@ setImmediate.js
 ===============
 **A NobleJS production**
 
-Copyright © 2011 Barnesandnoble.com llc. Released under the [MIT license][mit].
+Copyright © 2012 Barnesandnoble.com llc. Released under the [MIT license][mit].
 
 Introduction
 ------------

@@ -10,7 +10,7 @@
  *  - setTimeout(..., 0) in all other browsers
  * In other words, setImmediate and clearImmediate are safe in all browsers.
  *
- * Copyright © 2011 Barnesandnoble.com llc, Donavon West, and Domenic Denicola.
+ * Copyright © 2012 Barnesandnoble.com llc, Donavon West, and Domenic Denicola.
  * Special thanks to Yaffle (https://github.com/Yaffle) for his bug reports, fork, pull requests, and general
  * discussion, all of which have made setImmediate.js much better than its original form.
  * 
