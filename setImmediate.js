@@ -13,7 +13,7 @@
  * Copyright © 2012 Barnesandnoble.com llc, Donavon West, and Domenic Denicola.
  * Special thanks to Yaffle (https://github.com/Yaffle) for his bug reports, fork, pull requests, and general
  * discussion, all of which have made setImmediate.js much better than its original form.
- * 
+ *
  * Released under the MIT license (see MIT-LICENSE.txt).
  */
 
@@ -66,7 +66,7 @@
                         }
                     }
                 } else {
-                    // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a 
+                    // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
                     // "too much recursion" error.
                     global.setTimeout(function () {
                         tasks.runIfPresent(handle);
@@ -104,7 +104,6 @@
         global.onmessage = oldOnMessage;
 
         return postMessageIsAsynchronous;
-        return false;
     }
 
     function canUseReadyStateChange() {
@@ -176,7 +175,7 @@
 
             // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
             // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
-            var scriptEl = document.createElement("script");
+            var scriptEl = global.document.createElement("script");
             scriptEl.onreadystatechange = function () {
                 tasks.runIfPresent(handle);
 
@@ -184,7 +183,7 @@
                 scriptEl.parentNode.removeChild(scriptEl);
                 scriptEl = null;
             };
-            document.documentElement.appendChild(scriptEl);
+            global.document.documentElement.appendChild(scriptEl);
 
             return handle;
         };
@@ -193,7 +192,7 @@
     function installSetTimeoutImplementation(attachTo) {
         attachTo.setImmediate = function () {
             var handle = tasks.addFromSetImmediateArguments(arguments);
-            
+
             global.setTimeout(function () {
                 tasks.runIfPresent(handle);
             }, 0);
