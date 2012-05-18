@@ -4,8 +4,8 @@
  * https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/setImmediate/Overview.html
  * Uses one of the following implementations:
  *  - Native msSetImmediate/msClearImmediate in IE10
- *  - MessageChannel in supporting (very recent) browsers: advantageous because it works in a web worker context
- *  - postMessage in Firefox 3+, Internet Explorer 9+, WebKit, and Opera 9.5+ (except where MessageChannel is used)
+ *  - postMessage in Firefox 3+, Internet Explorer 9+, WebKit, and Opera 9.5+
+ *  - MessageChannel in web workers, in WebKit and Opera
  *  - <script> element onreadystatechange in Internet Explorer 6–8
  *  - setTimeout(..., 0) in all other browsers
  * In other words, setImmediate and clearImmediate are safe in all browsers.
@@ -211,12 +211,12 @@
             // For IE10
             aliasMicrosoftImplementation(attachTo);
         } else {
-            if (canUseMessageChannel()) {
-                // For super-modern browsers; also works inside web workers
-                installMessageChannelImplementation(attachTo);
-            } else if (canUsePostMessage()) {
-                // For modern browsers
+            if (canUsePostMessage()) {
+                // For non-IE10 modern browsers
                 installPostMessageImplementation(attachTo);
+            } else if (canUseMessageChannel()) {
+                // For web workers, where supported
+                installMessageChannelImplementation(attachTo);
             } else if (canUseReadyStateChange()) {
                 // For IE 6–8
                 installReadyStateChangeImplementation(attachTo);
