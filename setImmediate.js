@@ -116,17 +116,15 @@
     }
 
     function installMessageChannelImplementation(attachTo) {
+        var channel = new global.MessageChannel();
+        channel.port1.onmessage = function (event) {
+            var handle = event.data;
+            tasks.runIfPresent(handle);
+        };
         attachTo.setImmediate = function () {
             var handle = tasks.addFromSetImmediateArguments(arguments);
 
-            // Create a channel and immediately post a message to it with the handle.
-            var channel = new global.MessageChannel();
-            channel.port1.onmessage = function () {
-                tasks.runIfPresent(handle);
-            };
-
-            // IE10 requires a message, so send `null`.
-            channel.port2.postMessage(null);
+            channel.port2.postMessage(handle);
 
             return handle;
         };
