@@ -36,6 +36,6 @@
             "safari": ["5.0.5"]
         },
         "harness": "mocha",
-        "files": "test/test.js"
+        "files": "test/tests.js"
     }
 }
