@@ -104,7 +104,7 @@ if (typeof window !== "undefined") {
 }
 
 if (typeof window !== "undefined" && typeof window.Worker === "function") {
-    specify("When inside a web worker context, setImmediate calls the passed handler", function (done) {
+    specify.skip("When inside a web worker context, setImmediate calls the passed handler", function (done) {
         var worker = new window.Worker("worker.js");
         worker.addEventListener("message", function (event) {
             assert.strictEqual(event.data, "TEST");
