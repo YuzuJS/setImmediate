@@ -1,6 +1,4 @@
-﻿/*jshint curly: true, eqeqeq: true, immed: true, newcap: true, noarg: true, nonew: true, undef: true, white: true, trailing: true, evil: true */
-
-/* A cross-browser setImmediate and clearImmediate:
+﻿/* A cross-browser setImmediate and clearImmediate:
  * https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/setImmediate/Overview.html
  * Uses one of the following implementations:
  *  - Native msSetImmediate/msClearImmediate in IE10
@@ -9,12 +7,6 @@
  *  - <script> element onreadystatechange in Internet Explorer 6–8
  *  - setTimeout(..., 0) in all other browsers
  * In other words, setImmediate and clearImmediate are safe in all browsers.
- *
- * Copyright © 2012 Barnesandnoble.com llc, Donavon West, and Domenic Denicola.
- * Special thanks to Yaffle (https://github.com/Yaffle) for his bug reports, fork, pull requests, and general
- * discussion, all of which have made setImmediate.js much better than its original form.
- *
- * Released under the MIT license (see MIT-LICENSE.txt).
  */
 
 (function (global, undefined) {
@@ -33,6 +25,7 @@
                 this.handler.apply(undefined, this.args);
             } else {
                 var scriptSource = "" + this.handler;
+                /*jshint evil: true */
                 eval(scriptSource);
             }
         };

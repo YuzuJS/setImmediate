@@ -2,8 +2,6 @@ setImmediate.js
 ===============
 **A NobleJS production**
 
-Copyright © 2012 Barnesandnoble.com llc. Released under the [MIT license][mit].
-
 Introduction
 ------------
 
@@ -30,7 +28,6 @@ Reference pages
  * [Introductory blog post by Nicholas C. Zakas][ncz]
 
 
-[mit]: https://github.com/NobleJS/setImmediate/blob/master/MIT-LICENSE.txt
 [spec]: https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/setImmediate/Overview.html
 [list-post]: http://lists.w3.org/Archives/Public/public-web-perf/2011Jun/0100.html
 [demo]: http://ie.microsoft.com/testdrive/Performance/setImmediateSorting/Default.html
