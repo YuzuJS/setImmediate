@@ -1,6 +1,7 @@
 ﻿/* A cross-browser setImmediate and clearImmediate:
  * https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/setImmediate/Overview.html
  * Uses one of the following implementations:
+ *  - `process.nextTick` in Node < 0.9
  *  - Native msSetImmediate/msClearImmediate in IE10
  *  - postMessage in Firefox 3+, Internet Explorer 9+, WebKit, and Opera 9.5+
  *  - MessageChannel in web workers, in WebKit and Opera
@@ -72,6 +73,12 @@
         };
     }());
 
+    function canUseNextTick() {
+        // Don't get fooled by e.g. browserify environments.
+        return typeof global.process === "object" &&
+               Object.prototype.toString.call(global.process) === "[object process]";
+    }
+
     function hasMicrosoftImplementation() {
         return !!(global.msSetImmediate && global.msClearImmediate);
     }
@@ -101,6 +108,18 @@
 
     function canUseReadyStateChange() {
         return "document" in global && "onreadystatechange" in global.document.createElement("script");
+    }
+
+    function installNextTickImplementation(attachTo) {
+        attachTo.setImmediate = function () {
+            var handle = tasks.addFromSetImmediateArguments(arguments);
+
+            global.process.nextTick(function () {
+                tasks.runIfPresent(handle);
+            });
+
+            return handle;
+        };
     }
 
     function aliasMicrosoftImplementation(attachTo) {
@@ -202,7 +221,10 @@
             // For IE10
             aliasMicrosoftImplementation(attachTo);
         } else {
-            if (canUsePostMessage()) {
+            if (canUseNextTick()) {
+                // For Node.js before 0.9
+                installNextTickImplementation(attachTo);
+            } else if (canUsePostMessage()) {
                 // For non-IE10 modern browsers
                 installPostMessageImplementation(attachTo);
             } else if (canUseMessageChannel()) {
