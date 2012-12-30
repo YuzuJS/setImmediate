@@ -18,9 +18,11 @@
     },
     "main": "setImmediate.js",
     "scripts": {
-        "lint": "jshint setImmediate.js"
+        "lint": "jshint setImmediate.js",
+        "test": "mocha"
     },
     "devDependencies": {
-        "jshint": ">= 0.9.1"
+        "jshint": ">= 0.9.1",
+        "mocha": ">= 1.7.4"
     }
 }
