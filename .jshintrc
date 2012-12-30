@@ -9,6 +9,7 @@
     "latedef": true,
     "newcap": true,
     "noarg": true,
+    "node": true,
     "nonew": true,
     "nomen": true,
     "quotmark": "double",

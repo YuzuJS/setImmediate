@@ -75,8 +75,8 @@
 
     function canUseNextTick() {
         // Don't get fooled by e.g. browserify environments.
-        return typeof global.process === "object" &&
-               Object.prototype.toString.call(global.process) === "[object process]";
+        return typeof process === "object" &&
+               Object.prototype.toString.call(process) === "[object process]";
     }
 
     function hasMicrosoftImplementation() {
@@ -114,7 +114,7 @@
         attachTo.setImmediate = function () {
             var handle = tasks.addFromSetImmediateArguments(arguments);
 
-            global.process.nextTick(function () {
+            process.nextTick(function () {
                 tasks.runIfPresent(handle);
             });
 
@@ -241,4 +241,4 @@
             attachTo.clearImmediate = tasks.remove;
         }
     }
-}(this));
+}(typeof global === "object" && global ? global : this));
