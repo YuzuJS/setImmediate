@@ -19,11 +19,13 @@
     "main": "setImmediate.js",
     "scripts": {
         "lint": "jshint setImmediate.js",
-        "test": "mocha"
+        "test": "mocha",
+        "test-browser": "zuul --server 9000 test/tests.js"
     },
     "devDependencies": {
         "jshint": ">= 0.9.1",
-        "mocha": ">= 1.7.4"
+        "mocha": ">= 1.7.4",
+        "zuul": ">= 0.0.1"
     },
     "testling": {
         "browsers": {
