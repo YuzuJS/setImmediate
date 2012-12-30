@@ -20,7 +20,7 @@
     "scripts": {
         "lint": "jshint setImmediate.js",
         "test": "mocha test/tests.js",
-        "test-browser": "zuul --server 9000 test/tests.js"
+        "test-browser": "zuul --server 9000 test/tests.js --wwwroot test/"
     },
     "devDependencies": {
         "jshint": ">= 0.9.1",
