@@ -29,11 +29,11 @@
     },
     "testling": {
         "browsers": {
-            "ie": [6, 7, 8, 9],
-            "chrome": [4, 23, "canary"],
-            "firefox": [3, 3.5, 3.6, 4, 17, "nightly"],
-            "opera": [10, 10.5, 11, 11.5, 11.6, 12, "next"],
-            "safari": ["5.0.5", 5.1]
+            "ie": [6],
+            "chrome": [4],
+            "firefox": [3],
+            "opera": [10],
+            "safari": ["5.0.5"]
         },
         "harness": "mocha",
         "files": "test/test.js"
