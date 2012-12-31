@@ -1,3 +1,8 @@
+<a href="http://ci.testling.com/NobleJS/setImmediate">
+    <img src="http://ci.testling.com/NobleJS/setImmediate.png" alt="Testling-CI badge showing browser compliance"
+         align="right">
+</a>
+
 # setImmediate.js
 **A NobleJS production**
 
