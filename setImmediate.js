@@ -1,4 +1,4 @@
-﻿/* A cross-browser setImmediate and clearImmediate:
+/* A cross-browser setImmediate and clearImmediate:
  * https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/setImmediate/Overview.html
  * Uses one of the following implementations:
  *  - `process.nextTick` in Node < 0.9
