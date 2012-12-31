@@ -2,7 +2,6 @@
  * https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/setImmediate/Overview.html
  * Uses one of the following implementations:
  *  - `process.nextTick` in Node < 0.9
- *  - Native msSetImmediate/msClearImmediate in IE10
  *  - postMessage in Firefox 3+, Internet Explorer 9+, WebKit, and Opera 9.5+
  *  - MessageChannel in web workers, in WebKit and Opera
  *  - <script> element onreadystatechange in Internet Explorer 6–8
@@ -79,10 +78,6 @@
                Object.prototype.toString.call(process) === "[object process]";
     }
 
-    function hasMicrosoftImplementation() {
-        return !!(global.msSetImmediate && global.msClearImmediate);
-    }
-
     function canUseMessageChannel() {
         return !!global.MessageChannel;
     }
@@ -120,11 +115,6 @@
 
             return handle;
         };
-    }
-
-    function aliasMicrosoftImplementation(attachTo) {
-        attachTo.setImmediate = global.msSetImmediate;
-        attachTo.clearImmediate = global.msClearImmediate;
     }
 
     function installMessageChannelImplementation(attachTo) {
@@ -217,28 +207,23 @@
                           Object.getPrototypeOf(global)
                         : global;
 
-        if (hasMicrosoftImplementation()) {
-            // For IE10
-            aliasMicrosoftImplementation(attachTo);
+        if (canUseNextTick()) {
+            // For Node.js before 0.9
+            installNextTickImplementation(attachTo);
+        } else if (canUsePostMessage()) {
+            // For non-IE10 modern browsers
+            installPostMessageImplementation(attachTo);
+        } else if (canUseMessageChannel()) {
+            // For web workers, where supported
+            installMessageChannelImplementation(attachTo);
+        } else if (canUseReadyStateChange()) {
+            // For IE 6–8
+            installReadyStateChangeImplementation(attachTo);
         } else {
-            if (canUseNextTick()) {
-                // For Node.js before 0.9
-                installNextTickImplementation(attachTo);
-            } else if (canUsePostMessage()) {
-                // For non-IE10 modern browsers
-                installPostMessageImplementation(attachTo);
-            } else if (canUseMessageChannel()) {
-                // For web workers, where supported
-                installMessageChannelImplementation(attachTo);
-            } else if (canUseReadyStateChange()) {
-                // For IE 6–8
-                installReadyStateChangeImplementation(attachTo);
-            } else {
-                // For older browsers
-                installSetTimeoutImplementation(attachTo);
-            }
-
-            attachTo.clearImmediate = tasks.remove;
+            // For older browsers
+            installSetTimeoutImplementation(attachTo);
         }
+
+        attachTo.clearImmediate = tasks.remove;
     }
 }(typeof global === "object" && global ? global : this));
