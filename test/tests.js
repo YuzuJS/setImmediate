@@ -78,37 +78,3 @@ specify("`clearImmediate` does not interfere with handlers other than the one wi
         done();
     }, 100);
 });
-
-if (typeof window !== "undefined") {
-    specify.skip("Modal dialogs block handlers", function (done) {
-        // Try to launch the less-annoying self-closing-window modal dialog; if that's not an option, fall back to alert.
-        var showTheDialog = window.showModalDialog ?
-            function () {
-                window.showModalDialog("selfClose.htm");
-            }
-            : function () {
-                window.alert("Please press OK to continue the test; we needed a modal dialog.");
-            };
-
-        var dialogClosed = false;
-        setImmediate(function () {
-            showTheDialog();
-            dialogClosed = true;
-        });
-
-        setImmediate(function () {
-            assert(dialogClosed);
-            done();
-        });
-    });
-}
-
-if (typeof window !== "undefined" && typeof window.Worker === "function") {
-    specify.skip("When inside a web worker context, setImmediate calls the passed handler", function (done) {
-        var worker = new window.Worker("worker.js");
-        worker.addEventListener("message", function (event) {
-            assert.strictEqual(event.data, "TEST");
-            done();
-        }, false);
-    });
-}

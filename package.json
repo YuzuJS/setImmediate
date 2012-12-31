@@ -20,12 +20,15 @@
     "scripts": {
         "lint": "jshint setImmediate.js",
         "test": "mocha test/tests.js",
-        "test-browser": "zuul --server 9000 test/tests.js --wwwroot test/"
+        "test-browser": "opener http://localhost:9000 && zuul --server 9000 test/tests.js --wwwroot test/",
+        "test-browser-only": "opener http://localhost:9007/test/browserOnly/index.html && http-server . -p 9007"
     },
     "devDependencies": {
         "jshint": ">= 0.9.1",
         "mocha": ">= 1.7.4",
-        "zuul": ">= 0.0.1"
+        "zuul": ">= 0.0.1",
+        "http-server": ">= 0.5.3",
+        "opener": ">= 1.1.0"
     },
     "testling": {
         "browsers": {
