@@ -80,7 +80,7 @@ specify("`clearImmediate` does not interfere with handlers other than the one wi
 });
 
 if (typeof window !== "undefined") {
-    specify("Modal dialogs block handlers", function (done) {
+    specify.skip("Modal dialogs block handlers", function (done) {
         // Try to launch the less-annoying self-closing-window modal dialog; if that's not an option, fall back to alert.
         var showTheDialog = window.showModalDialog ?
             function () {
