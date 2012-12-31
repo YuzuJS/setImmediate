@@ -1,14 +1,3 @@
-/* A cross-browser setImmediate and clearImmediate:
- * https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/setImmediate/Overview.html
- * Uses one of the following implementations:
- *  - `process.nextTick` in Node < 0.9
- *  - postMessage in Firefox 3+, Internet Explorer 9+, WebKit, and Opera 9.5+
- *  - MessageChannel in web workers, in WebKit and Opera
- *  - <script> element onreadystatechange in Internet Explorer 6–8
- *  - setTimeout(..., 0) in all other browsers
- * In other words, setImmediate and clearImmediate are safe in all browsers.
- */
-
 (function (global, undefined) {
     "use strict";
 
