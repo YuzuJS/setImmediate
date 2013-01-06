@@ -74,18 +74,23 @@ require("setimmediate");
 
 somewhere early in your app; it attaches to the global.
 
+## Demo
+
+* [Quick sort demo][cross-browser-demo]
+ 
 ## Reference and Reading
 
  * [Efficient Script Yielding W3C Editor's Draft][spec]
  * [W3C mailing list post introducing the specification][list-post]
- * [IE Test Drive demo][demo]
+ * [IE Test Drive demo][ie-demo]
  * [Introductory blog post by Nicholas C. Zakas][ncz]
 
 
 [spec]: https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/setImmediate/Overview.html
 [list-post]: http://lists.w3.org/Archives/Public/public-web-perf/2011Jun/0100.html
-[demo]: http://ie.microsoft.com/testdrive/Performance/setImmediateSorting/Default.html
+[ie-demo]: http://ie.microsoft.com/testdrive/Performance/setImmediateSorting/Default.html
 [ncz]: http://www.nczonline.net/blog/2011/09/19/script-yielding-with-setimmediate/
 [nextTick]: http://nodejs.org/docs/v0.8.16/api/process.html#process_process_nexttick_callback
 [postMessage]: http://www.whatwg.org/specs/web-apps/current-work/multipage/web-messaging.html#posting-messages
 [MessageChannel]: http://www.whatwg.org/specs/web-apps/current-work/multipage/web-messaging.html#channel-messaging
+[cross-browser-demo]: http://jphpsf.github.com/setImmediate-shim-demo
