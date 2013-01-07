@@ -4,7 +4,7 @@
     var tasks = (function () {
         function Task(handler, args) {
             this.handler = handler;
-            this.args = Array.prototype.slice.call(args);
+            this.args = args;
         }
         Task.prototype.run = function () {
             // See steps in section 5 of the spec.
