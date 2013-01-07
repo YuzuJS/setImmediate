@@ -1,7 +1,7 @@
 {
     "name": "setimmediate",
     "description": "A shim for the setImmediate efficient script yielding API",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "author": "NobleJS",
     "contributors": [
         "Domenic Denicola <domenic@domenicdenicola.com> (http://domenicdenicola.com)",
