@@ -29,13 +29,16 @@
         "opener": "~1.3"
     },
     "testling": {
-        "browsers": {
-            "ie": [6, 7, 8, 9],
-            "chrome": [4, 23, "canary"],
-            "firefox": [3, 3.5, 3.6, 4, 17, "nightly"],
-            "opera": [10, 10.5, 11, 11.5, 11.6, 12, "next"],
-            "safari": ["5.0.5", 5.1]
-        },
+        "browsers": [
+            "ie/6..latest",
+            "firefox/3..nightly",
+            "chrome/4..canary",
+            "safari/5.0.5..latest",
+            "opera/10..next",
+            "iphone/6",
+            "ipad/6",
+            "android/4.2"
+        ],
         "harness": "mocha",
         "files": "test/tests.js"
     }
