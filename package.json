@@ -13,9 +13,7 @@
         "type": "git",
         "url": "git://github.com/NobleJS/setImmediate.git"
     },
-    "bugs": {
-        "url": "http://github.com/NobleJS/setImmediate/issues"
-    },
+    "bugs": "https://github.com/NobleJS/setImmediate/issues",
     "main": "setImmediate.js",
     "scripts": {
         "lint": "jshint setImmediate.js",
