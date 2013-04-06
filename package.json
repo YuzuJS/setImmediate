@@ -32,7 +32,7 @@
             "firefox/3..5", "firefox/19..nightly",
             "chrome/4..7", "chrome/24..canary",
             "opera/10..next",
-            "safari/5.0.5..latest",
+            "safari/4..latest",
             "iphone/6",
             "ipad/6"
         ],
