@@ -29,8 +29,8 @@
     "testling": {
         "browsers": [
             "ie/6..latest",
-            "firefox/3..nightly",
-            "chrome/4..canary",
+            "firefox/3..5", "firefox/19..nightly",
+            "chrome/4..7", "chrome/24..canary",
             "opera/10..next",
             "safari/5.0.5..latest",
             "iphone/6",
