@@ -31,11 +31,10 @@
             "ie/6..latest",
             "firefox/3..nightly",
             "chrome/4..canary",
-            "safari/5.0.5..latest",
             "opera/10..next",
+            "safari/5.0.5..latest",
             "iphone/6",
-            "ipad/6",
-            "android/4.2"
+            "ipad/6"
         ],
         "harness": "mocha",
         "files": "test/tests.js"
