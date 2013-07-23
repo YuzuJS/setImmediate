@@ -1,0 +1,11 @@
+{
+  "name": "setimmediate",
+  "repo": "NobleJS/setImmediate",
+  "description": "A shim for the setImmediate efficient script yielding API",
+  "version": "1.0.1",
+  "license": "MIT",
+  "main": "setImmediate.js",
+  "scripts": [
+    "setImmediate.js"
+  ]
+}

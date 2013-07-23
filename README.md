@@ -73,11 +73,23 @@ require("setimmediate");
 ```
 
 somewhere early in your app; it attaches to the global.
+In [component.js](https://github.com/component/component), do
+
+```
+component install NobleJS/setImmediate
+```
+
+and require it when needed without global attachment.
+
+```js
+var setImmediate = require('setimmediate').setImmediate;
+var clearImmediate = require('setimmediate').clearImmediate;
+```
 
 ## Demo
 
 * [Quick sort demo][cross-browser-demo]
- 
+
 ## Reference and Reading
 
  * [Efficient Script Yielding W3C Editor's Draft][spec]

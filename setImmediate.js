@@ -215,4 +215,7 @@
 
         attachTo.clearImmediate = tasks.remove;
     }
-}(typeof global === "object" && global ? global : this));
+}(typeof global === "object" && global ? global : // node.js
+    typeof exports === "object" ? exports : // component.js
+    this // browser
+));
