@@ -1,42 +1,47 @@
 {
-    "name": "immediate",
-    "description": "A shim for the setImmediate efficient script yielding API",
-    "version": "2.0.1",
-    "author": "NobleJS",
-    "contributors": [
-        "Domenic Denicola <domenic@domenicdenicola.com> (http://domenicdenicola.com)",
-        "Donavon West <github@donavon.com> (http://donavon.com)",
-        "Yaffle",
-        "Calvin Metcalf <calvin.metcalf@gmail.com>"
+  "name": "immediate",
+  "description": "A shim for the setImmediate efficient script yielding API",
+  "version": "2.0.1",
+  "author": "NobleJS",
+  "contributors": [
+    "Domenic Denicola <domenic@domenicdenicola.com> (http://domenicdenicola.com)",
+    "Donavon West <github@donavon.com> (http://donavon.com)",
+    "Yaffle",
+    "Calvin Metcalf <calvin.metcalf@gmail.com>"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/calvinmetcalf/setImmediate.git"
+  },
+  "bugs": "https://github.com/calvinmetcalf/setImmediate/issues",
+  "main": "dist/setImmediate.js",
+  "scripts": {
+    "test": "mocha test/tests.js -R nyan",
+    "test-browser-only": "opener http://localhost:9007/test/browserOnly/index.html && http-server . -p 9007",
+    "start": "npm run-script build",
+    "build": "component build -o dist -n setImmediate -s setImmediate"
+  },
+  "devDependencies": {
+    "jshint": "~1.1",
+    "mocha": "1.9.x",
+    "http-server": "~0.5.3",
+    "opener": "~1.3",
+    "component": "~0.17.6"
+  },
+  "testling": {
+    "browsers": [
+      "ie/6..latest",
+      "firefox/3..5",
+      "firefox/19..nightly",
+      "chrome/4..7",
+      "chrome/24..canary",
+      "opera/10..next",
+      "safari/4..latest",
+      "iphone/6",
+      "ipad/6"
     ],
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/calvinmetcalf/setImmediate.git"
-    },
-    "bugs": "https://github.com/calvinmetcalf/setImmediate/issues",
-    "main": "dist/setImmediate.js",
-    "scripts": {
-        "test": "mocha test/tests.js -R nyan",
-        "test-browser-only": "opener http://localhost:9007/test/browserOnly/index.html && http-server . -p 9007"
-    },
-    "devDependencies": {
-        "jshint": "~1.1",
-        "mocha": "1.9.x",
-        "http-server": "~0.5.3",
-        "opener": "~1.3"
-    },
-    "testling": {
-        "browsers": [
-            "ie/6..latest",
-            "firefox/3..5", "firefox/19..nightly",
-            "chrome/4..7", "chrome/24..canary",
-            "opera/10..next",
-            "safari/4..latest",
-            "iphone/6",
-            "ipad/6"
-        ],
-        "harness": "mocha",
-        "files": "test/tests.js"
-    }
+    "harness": "mocha",
+    "files": "test/tests.js"
+  }
 }
