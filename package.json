@@ -1,12 +1,13 @@
 {
-    "name": "setimmediate",
+    "name": "immediate",
     "description": "A shim for the setImmediate efficient script yielding API",
     "version": "2.0.0",
     "author": "NobleJS",
     "contributors": [
         "Domenic Denicola <domenic@domenicdenicola.com> (http://domenicdenicola.com)",
         "Donavon West <github@donavon.com> (http://donavon.com)",
-        "Yaffle"
+        "Yaffle",
+        "Calvin Metcalf <calvin.metcalf@gmail.com>"
     ],
     "license": "MIT",
     "repository": {
