@@ -1,4 +1,4 @@
-﻿function runAll() {
+function runAll() {
     asyncTest("When a handler is queued with setImmediate, it executes eventually", 1, function () {
         setImmediate(function () {
             ok(true, "The handler is called eventually.");
@@ -50,7 +50,7 @@
         }
 
         var handle = setImmediate(handler);
-        clearImmediate(handle);
+        setImmediate.clear(handle);
 
         setTimeout(function () {
             ok(!handlerCalled, "After one second, the handler has not been not called.");
@@ -66,10 +66,10 @@
         }
 
         setImmediate(handler, "A");
-        clearImmediate(setImmediate(handler, "B"));
+        setImmediate.clear(setImmediate(handler, "B"));
         var handle = setImmediate(handler, "C");
         setImmediate(handler, "D");
-        clearImmediate(handle);
+        setImmediate.clear(handle);
 
         setTimeout(function () {
             deepEqual(recordedArgs, expectedArgs, "Only the non-cleared invocations of the handler occurr.");

@@ -1,4 +1,4 @@
-importScripts("../../setImmediate.js");
+importScripts("../../dist/setImmediate.js");
 
 setImmediate(function () {
 	self.postMessage("TEST");

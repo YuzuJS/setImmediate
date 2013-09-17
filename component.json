@@ -1,0 +1,21 @@
+{
+  "name": "setImmediate",
+  "repo": "calvinmetcalf/setImmediate",
+  "description": "shapefies in your browser",
+  "version": "1.0.1",
+  "keywords": [],
+  "development": {},
+  "license": "MIT",
+  "main": "lib/index.js",
+  "scripts": [
+    "lib/index.js",
+    "lib/realSetImmediate.js",
+    "lib/nextTick.js",
+    "lib/postMessage.js",
+    "lib/messageChannel.js",
+    "lib/stateChange.js",
+    "lib/timeout.js",
+    "lib/tasks.js",
+    "lib/global.js"
+  ]
+}
