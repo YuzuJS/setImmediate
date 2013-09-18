@@ -209,50 +209,64 @@ require('./postMessage'),
 require('./messageChannel'),
 require('./stateChange'),
 require('./timeout')];
+var handlerQueue = [];
+function drainQueue() {
+    var i = 0,task;
+    /*jslint boss: true */
+    while (task = handlerQueue[i++]) {
+        task();
+    }
 
-
-
+    handlerQueue = [];
+}
+var nextTick;
 types.some(function(obj) {
     var t = obj.test();
     if (t) {
-        module.exports = obj.install();
+        nextTick = obj.install(drainQueue);
     }
     return t;
 });
+var retFunc = function(task) {
+    var len, args;
+    if(arguments.length > 1 && typeof task === 'function'){
+        args = Array.prototype.slice.call(arguments,1);
+        args.unshift(undefined);
+        task = task.bind.apply(task,args);
+    }
+    if ((len = handlerQueue.push(task)) === 1) {
+        nextTick(drainQueue);
+    }
+    return len;
+};
+retFunc.clear = function(n){
+    handlerQueue[n-1]=function(){};
+    return this;
+};
+module.exports=retFunc;
 });
 require.register("setImmediate/lib/realSetImmediate.js", function(exports, require, module){
+var global = require('./global');
 exports.test = function(){
-    return typeof setImmediate !== 'undefined';
+    return global.setImmediate;
 };
 
 exports.install = function() {
-     setImmediate.clear = clearImmediate;
-     return setImmediate;
+     return setImmediate.bind(global);
 };
 });
 require.register("setImmediate/lib/nextTick.js", function(exports, require, module){
-var tasks = require('./tasks');
+
 exports.test = function() {
     // Don't get fooled by e.g. browserify environments.
     return typeof process === "object" && Object.prototype.toString.call(process) === "[object process]";
 };
 
-exports.install = function(attachTo) {
-    var returnFunc = function() {
-        var handle = tasks.addFromSetImmediateArguments(arguments);
-
-        process.nextTick(function() {
-            tasks.runIfPresent(handle);
-        });
-
-        return handle;
-    };
-    returnFunc.clear = tasks.remove;
-    return returnFunc;
+exports.install = function() {
+    return process.nextTick;
 };
 });
 require.register("setImmediate/lib/postMessage.js", function(exports, require, module){
-var tasks = require('./tasks');
 var global = require('./global');
 exports.test = function() {
     // The test against `importScripts` prevents this implementation from being installed inside a web worker,
@@ -273,85 +287,51 @@ exports.test = function() {
     return postMessageIsAsynchronous;
 };
 
-exports.install = function() {
-    // Installs an event handler on `global` for the `message` event: see
-    // * https://developer.mozilla.org/en/DOM/window.postMessage
-    // * http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#crossDocumentMessages
-
-    var MESSAGE_PREFIX = "com.bn.NobleJS.setImmediate" + Math.random();
-
-    function isStringAndStartsWith(string, putativeStart) {
-        return typeof string === "string" && string.substring(0, putativeStart.length) === putativeStart;
-    }
-
-    function onGlobalMessage(event) {
-        // This will catch all incoming messages (even from other windows!), so we need to try reasonably hard to
-        // avoid letting anyone else trick us into firing off. We test the origin is still this window, and that a
-        // (randomly generated) unpredictable identifying prefix is present.
-        if (event.source === global && isStringAndStartsWith(event.data, MESSAGE_PREFIX)) {
-            var handle = event.data.substring(MESSAGE_PREFIX.length);
-            tasks.runIfPresent(handle);
+exports.install = function(func) {
+    var codeWord = 'com.calvinmetcalf.setImmediate' + Math.random();
+    function globalMessage(event) {
+        if (event.source === global && event.data === codeWord) {
+            func();
         }
     }
     if (global.addEventListener) {
-        global.addEventListener("message", onGlobalMessage, false);
+        global.addEventListener('message', globalMessage, false);
+    } else {
+        global.attachEvent("onmessage", globalMessage);
     }
-    else {
-        global.attachEvent("onmessage", onGlobalMessage);
-    }
-
-    var returnFunc =  function() {
-        var handle = tasks.addFromSetImmediateArguments(arguments);
-
-        // Make `global` post a message to itself with the handle and identifying prefix, thus asynchronously
-        // invoking our onGlobalMessage listener above.
-        global.postMessage(MESSAGE_PREFIX + handle, "*");
-
-        return handle;
+    return function() {
+        postMessage(codeWord, '*');
     };
-    returnFunc.clear = tasks.remove;
-    return returnFunc;
 };
 });
 require.register("setImmediate/lib/messageChannel.js", function(exports, require, module){
-var tasks = require('./tasks');
 var global = require('./global');
 exports.test = function() {
     return !!global.MessageChannel;
 };
 
-exports.install = function(attachTo) {
-    var channel = new global.MessageChannel();
-    channel.port1.onmessage = function(event) {
-        var handle = event.data;
-        tasks.runIfPresent(handle);
+exports.install = function(func) {
+    var channel = new MessageChannel();
+    channel.port1.onmessage = func;
+    return function() {
+        channel.port2.postMessage(0);
     };
-    var returnFunc = function() {
-        var handle = tasks.addFromSetImmediateArguments(arguments);
-
-        channel.port2.postMessage(handle);
-
-        return handle;
-    };
-    returnFunc.clear = tasks.remove;
-    return returnFunc;
 };
 });
 require.register("setImmediate/lib/stateChange.js", function(exports, require, module){
-var tasks = require('./tasks');
+var global = require('./global');
 exports.test = function() {
     return "document" in global && "onreadystatechange" in global.document.createElement("script");
 };
 
-exports.install = function() {
-    var returnFunc = function() {
-        var handle = tasks.addFromSetImmediateArguments(arguments);
+exports.install = function(handle) {
+    return function() {
 
         // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
         // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
         var scriptEl = global.document.createElement("script");
         scriptEl.onreadystatechange = function() {
-            tasks.runIfPresent(handle);
+            handle();
 
             scriptEl.onreadystatechange = null;
             scriptEl.parentNode.removeChild(scriptEl);
@@ -361,88 +341,17 @@ exports.install = function() {
 
         return handle;
     };
-    returnFunc.clear = tasks.remove;
-    return returnFunc;
 };
 });
 require.register("setImmediate/lib/timeout.js", function(exports, require, module){
-var tasks = require('./tasks');
-
 exports.test = function() {
     return true;
 };
 
-exports.install = function(attachTo) {
+exports.install = function(t) {
     return function() {
-        var handle = tasks.addFromSetImmediateArguments(arguments);
-
-        global.setTimeout(function() {
-            tasks.runIfPresent(handle);
-        }, 0);
-
-        return handle;
+        setTimeout(t, 0);
     };
-};
-exports.clearImmediate = tasks.remove;
-});
-require.register("setImmediate/lib/tasks.js", function(exports, require, module){
-function Task(handler, args) {
-    this.handler = handler;
-    this.args = args;
-}
-Task.prototype.run = function() {
-    // See steps in section 5 of the spec.
-    if (typeof this.handler === "function") {
-        // Choice of `thisArg` is not in the setImmediate spec; `undefined` is in the setTimeout spec though:
-        // http://www.whatwg.org/specs/web-apps/current-work/multipage/timers.html
-        this.handler.apply(undefined, this.args);
-    }
-    else {
-        var scriptSource = "" + this.handler;
-        /*jshint evil: true */
-        eval(scriptSource);
-    }
-};
-
-var nextHandle = 1; // Spec says greater than zero
-var tasksByHandle = {};
-var currentlyRunningATask = false;
-
-exports.addFromSetImmediateArguments = function(args) {
-    var handler = args[0];
-    var argsToHandle = Array.prototype.slice.call(args, 1);
-    var task = new Task(handler, argsToHandle);
-
-    var thisHandle = nextHandle++;
-    tasksByHandle[thisHandle] = task;
-    return thisHandle;
-};
-exports.runIfPresent = function(handle) {
-    // From the spec: "Wait until any invocations of this algorithm started before this one have completed."
-    // So if we're currently running a task, we'll need to delay this invocation.
-    if (!currentlyRunningATask) {
-        var task = tasksByHandle[handle];
-        if (task) {
-            currentlyRunningATask = true;
-            try {
-                task.run();
-            }
-            finally {
-                delete tasksByHandle[handle];
-                currentlyRunningATask = false;
-            }
-        }
-    }
-    else {
-        // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
-        // "too much recursion" error.
-        setTimeout(function() {
-            exports.runIfPresent(handle);
-        }, 0);
-    }
-};
-exports.remove = function(handle) {
-    delete tasksByHandle[handle];
 };
 });
 require.register("setImmediate/lib/global.js", function(exports, require, module){

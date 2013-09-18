@@ -1,8 +1,8 @@
 {
-  "name": "setImmediate",
+  "name": "immediate",
   "repo": "calvinmetcalf/setImmediate",
   "description": "A shim for the setImmediate efficient script yielding API",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "keywords": [],
   "development": {},
   "license": "MIT",
@@ -15,7 +15,6 @@
     "lib/messageChannel.js",
     "lib/stateChange.js",
     "lib/timeout.js",
-    "lib/tasks.js",
     "lib/global.js"
   ]
 }
