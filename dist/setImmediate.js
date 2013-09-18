@@ -362,5 +362,5 @@ require.alias("immediate/lib/index.js", "immediate/index.js");if (typeof exports
 } else if (typeof define == "function" && define.amd) {
   define(function(){ return require("immediate"); });
 } else {
-  this["immediate"] = require("immediate");
+  this["setImmediate"] = require("immediate");
 }})();
