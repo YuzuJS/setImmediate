@@ -19,9 +19,7 @@
   "scripts": {
     "test": "mocha test/tests.js -R nyan",
     "test-browser-only": "opener http://localhost:9007/test/browserOnly/index.html && http-server . -p 9007",
-    "start": "npm run-script build",
-    "build": "component build -o dist -n setImmediate -s setImmediate",
-    "noConflict": "component build -o dist -n immediate -s immediate"
+    "build": "component build -o dist -n immediate -s immediate"
   },
   "devDependencies": {
     "jshint": "~1.1",
