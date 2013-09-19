@@ -80,4 +80,4 @@ somewhere early in your app; it attaches to the global.
 [nextTick]: http://nodejs.org/docs/v0.8.16/api/process.html#process_process_nexttick_callback
 [postMessage]: http://www.whatwg.org/specs/web-apps/current-work/multipage/web-messaging.html#posting-messages
 [MessageChannel]: http://www.whatwg.org/specs/web-apps/current-work/multipage/web-messaging.html#channel-messaging
-[cross-browser-demo]: http://jphpsf.github.com/setImmediate-shim-demo
+[cross-browser-demo]: http://calvinmetcalf.github.io/setImmediate-shim-demo
