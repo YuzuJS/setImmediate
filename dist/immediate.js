@@ -203,15 +203,18 @@ require.relative = function(parent) {
 require.register("immediate/lib/index.js", function(exports, require, module){
 "use strict";
 var types = [
-require('./realSetImmediate'),
-require('./nextTick'),
-require('./postMessage'),
-require('./messageChannel'),
-require('./stateChange'),
-require('./timeout')];
+    require("./realSetImmediate"),
+    require("./nextTick"),
+    require("./postMessage"),
+    require("./messageChannel"),
+    require("./stateChange"),
+    require("./timeout")
+];
 var handlerQueue = [];
+
 function drainQueue() {
-    var i = 0,task;
+    var i = 0,
+        task;
     /*jslint boss: true */
     while (task = handlerQueue[i++]) {
         task();
@@ -220,136 +223,143 @@ function drainQueue() {
     handlerQueue = [];
 }
 var nextTick;
-types.some(function(obj) {
+types.some(function (obj) {
     var t = obj.test();
     if (t) {
         nextTick = obj.install(drainQueue);
     }
     return t;
 });
-var retFunc = function(task) {
+var retFunc = function (task) {
     var len, args;
-    if(arguments.length > 1 && typeof task === 'function'){
-        args = Array.prototype.slice.call(arguments,1);
+    if (arguments.length > 1 && typeof task === "function") {
+        args = Array.prototype.slice.call(arguments, 1);
         args.unshift(undefined);
-        task = task.bind.apply(task,args);
+        task = task.bind.apply(task, args);
     }
     if ((len = handlerQueue.push(task)) === 1) {
         nextTick(drainQueue);
     }
     return len;
 };
-retFunc.clear = function(n){
-    handlerQueue[n-1]=function(){};
+retFunc.clear = function (n) {
+    if (n <= handlerQueue.length) {
+        handlerQueue[n - 1] = function () {};
+    }
     return this;
 };
-module.exports=retFunc;
+module.exports = retFunc;
 });
 require.register("immediate/lib/realSetImmediate.js", function(exports, require, module){
-var global = require('./global');
-exports.test = function(){
-    return global.setImmediate;
+"use strict";
+var globe = require("./global");
+exports.test = function () {
+    return globe.setImmediate;
 };
 
-exports.install = function() {
-     return setImmediate.bind(global);
+exports.install = function () {
+    return globe.setImmediate.bind(globe);
 };
 });
 require.register("immediate/lib/nextTick.js", function(exports, require, module){
-
-exports.test = function() {
+"use strict";
+exports.test = function () {
     // Don't get fooled by e.g. browserify environments.
     return typeof process === "object" && Object.prototype.toString.call(process) === "[object process]";
 };
 
-exports.install = function() {
+exports.install = function () {
     return process.nextTick;
 };
 });
 require.register("immediate/lib/postMessage.js", function(exports, require, module){
-var global = require('./global');
-exports.test = function() {
+"use strict";
+var globe = require("./global");
+exports.test = function () {
     // The test against `importScripts` prevents this implementation from being installed inside a web worker,
-    // where `global.postMessage` means something completely different and can't be used for this purpose.
+    // where `global.postMessage` means something completely different and can"t be used for this purpose.
 
-    if (!global.postMessage || global.importScripts) {
+    if (!globe.postMessage || globe.importScripts) {
         return false;
     }
 
     var postMessageIsAsynchronous = true;
-    var oldOnMessage = global.onmessage;
-    global.onmessage = function() {
+    var oldOnMessage = globe.onmessage;
+    globe.onmessage = function () {
         postMessageIsAsynchronous = false;
     };
-    global.postMessage("", "*");
-    global.onmessage = oldOnMessage;
+    globe.postMessage("", "*");
+    globe.onmessage = oldOnMessage;
 
     return postMessageIsAsynchronous;
 };
 
-exports.install = function(func) {
-    var codeWord = 'com.calvinmetcalf.setImmediate' + Math.random();
+exports.install = function (func) {
+    var codeWord = "com.calvinmetcalf.setImmediate" + Math.random();
     function globalMessage(event) {
-        if (event.source === global && event.data === codeWord) {
+        if (event.source === globe && event.data === codeWord) {
             func();
         }
     }
-    if (global.addEventListener) {
-        global.addEventListener('message', globalMessage, false);
+    if (globe.addEventListener) {
+        globe.addEventListener("message", globalMessage, false);
     } else {
-        global.attachEvent("onmessage", globalMessage);
+        globe.attachEvent("onmessage", globalMessage);
     }
-    return function() {
-        postMessage(codeWord, '*');
+    return function () {
+        globe.postMessage(codeWord, "*");
     };
 };
 });
 require.register("immediate/lib/messageChannel.js", function(exports, require, module){
-var global = require('./global');
-exports.test = function() {
-    return !!global.MessageChannel;
+"use strict";
+var globe = require("./global");
+exports.test = function () {
+    return !!globe.MessageChannel;
 };
 
-exports.install = function(func) {
-    var channel = new MessageChannel();
+exports.install = function (func) {
+    var channel = new globe.MessageChannel();
     channel.port1.onmessage = func;
-    return function() {
+    return function () {
         channel.port2.postMessage(0);
     };
 };
 });
 require.register("immediate/lib/stateChange.js", function(exports, require, module){
-var global = require('./global');
-exports.test = function() {
-    return "document" in global && "onreadystatechange" in global.document.createElement("script");
+"use strict";
+var globe = require("./global");
+exports.test = function () {
+    return "document" in globe && "onreadystatechange" in globe.document.createElement("script");
 };
 
-exports.install = function(handle) {
-    return function() {
+exports.install = function (handle) {
+    return function () {
 
         // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
         // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
-        var scriptEl = global.document.createElement("script");
-        scriptEl.onreadystatechange = function() {
+        var scriptEl = globe.document.createElement("script");
+        scriptEl.onreadystatechange = function () {
             handle();
 
             scriptEl.onreadystatechange = null;
             scriptEl.parentNode.removeChild(scriptEl);
             scriptEl = null;
         };
-        global.document.documentElement.appendChild(scriptEl);
+        globe.document.documentElement.appendChild(scriptEl);
 
         return handle;
     };
 };
 });
 require.register("immediate/lib/timeout.js", function(exports, require, module){
-exports.test = function() {
+"use strict";
+exports.test = function () {
     return true;
 };
 
-exports.install = function(t) {
-    return function() {
+exports.install = function (t) {
+    return function () {
         setTimeout(t, 0);
     };
 };
