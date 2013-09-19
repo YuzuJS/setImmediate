@@ -3,26 +3,11 @@
          align="right">
 </a>
 
-# setImmediate.js
-**A NobleJS production**
-
 ## Introduction
 
-**setImmediate.js** is a highly cross-browser implementation of the `setImmediate` and `clearImmediate` APIs, currently
-a [W3C draft spec][spec] from the Web Performance Working Group. `setImmediate` allows scripts to yield to the browser,
-executing a given operation asynchronously, in a manner that is typically more efficient and consumes less power than
-the usual `setTimeout(..., 0)` pattern.
+**immediate.js** is a cross between [NobleJS's setImmediate](https://github.com/NobleJS/setImmediate) and [Cujo's When](https://github.com/cujojs/when).
 
-setImmediate.js runs at “full speed” in the following browsers and environments, using various clever tricks:
-
- * Internet Explorer 6+
- * Firefox 3+
- * WebKit
- * Opera 9.5+
- * Node.js
- * Web workers in browsers that support `MessageChannel`, which I can't find solid info on.
-
-In all other browsers we fall back to using `setTimeout`, so it's always safe to use.
+immediate takes the tricks from setImmedate and combines them with the schedualer from when to make a 
 
 ## The Tricks
 
@@ -58,18 +43,20 @@ turn of the event loop, and is also faster than `setTimeout(…, 0)`, so hey, wh
 
 ## Usage
 
-In the browser, include it with a `<script>` tag; pretty simple.
+In the browser, include it with a `<script>` tag; pretty simple. Creates a global
+called `immediate` which should act like setImmediate. It also has a method called
+`clear` which should act like `clearImmediate`.
 
 In Node.js, do
 
 ```
-npm install setimmediate
+npm install immediate
 ```
 
 then
 
 ```js
-require("setimmediate");
+var immediate = require("immediate");
 ```
 
 somewhere early in your app; it attaches to the global.
