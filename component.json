@@ -2,7 +2,7 @@
   "name": "immediate",
   "repo": "calvinmetcalf/setImmediate",
   "description": "A shim for the setImmediate efficient script yielding API",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "keywords": [],
   "development": {},
   "license": "MIT",
