@@ -23,12 +23,12 @@ specify("Modal dialogs block handlers", function (done) {
         };
 
     var dialogClosed = false;
-    setImmediate(function () {
+    immediate(function () {
         showTheDialog();
         dialogClosed = true;
     });
 
-    setImmediate(function () {
+    immediate(function () {
         assert(dialogClosed);
         done();
     });

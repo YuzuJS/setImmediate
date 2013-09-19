@@ -2,7 +2,7 @@
 /*global setImmediate: false, clearImmediate: false, specify: false, window: false */
 
 var assert = require("assert");
-var setImmediate = require("../dist/setImmediate");
+var setImmediate = require("../dist/immediate");
 var clearImmediate = setImmediate.clear;
 specify("Handlers do execute", function (done) {
     setImmediate(function () {
