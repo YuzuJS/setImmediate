@@ -5,7 +5,7 @@
 
 ## Introduction
 
-**immediate.js** is a cross between [NobleJS's setImmediate](https://github.com/NobleJS/setImmediate) and [Cujo's When](https://github.com/cujojs/when).
+**immediate.js** is a cross between [NobleJS's setImmediate](https://github.com/NobleJS/setImmediate), [Cujo's When](https://github.com/cujojs/when), and [RSVP][RSVP].
 
 immediate takes the tricks from setImmedate and combines them with the schedualer from when to make a 
 
@@ -19,6 +19,10 @@ shim support for a global `setImmediate`. In Node.js 0.9 and above, `setImmediat
 Note that we check for *actual* Node.js environments, not emulated ones like those produced by browserify or similar.
 Such emulated environments often already include a `process.nextTick` shim that's not as browser-compatible as
 setImmediate.js.
+
+### `MutationObserver`
+
+This is what [RSVP][RSVP] uses, it's very fast, details on [MDN](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver)
 
 ### `postMessage`
 
@@ -72,7 +76,7 @@ somewhere early in your app; it attaches to the global.
  * [IE Test Drive demo][ie-demo]
  * [Introductory blog post by Nicholas C. Zakas][ncz]
 
-
+[RSVP]: https://github.com/tildeio/rsvp.js
 [spec]: https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/setImmediate/Overview.html
 [list-post]: http://lists.w3.org/Archives/Public/public-web-perf/2011Jun/0100.html
 [ie-demo]: http://ie.microsoft.com/testdrive/Performance/setImmediateSorting/Default.html
