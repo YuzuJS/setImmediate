@@ -215,13 +215,13 @@ var handlerQueue = [];
 
 function drainQueue() {
     var i = 0,
-        task;
-    /*jslint boss: true */
-    while (task = handlerQueue[i++]) {
-        task();
-    }
-
-    handlerQueue = [];
+        task,
+        innerQueue = handlerQueue;
+	handlerQueue = [];
+	/*jslint boss: true */
+	while (task = innerQueue[i++]) {
+		task();
+	}
 }
 var nextTick;
 types.some(function (obj) {
@@ -250,6 +250,7 @@ retFunc.clear = function (n) {
     return this;
 };
 module.exports = retFunc;
+
 });
 require.register("immediate/lib/realSetImmediate.js", function(exports, require, module){
 "use strict";
