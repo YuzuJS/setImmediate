@@ -255,12 +255,13 @@ require.register("immediate/lib/realSetImmediate.js", function(exports, require,
 "use strict";
 var globe = require("./global");
 exports.test = function () {
-    return globe.setImmediate;
+    return false;
 };
 
 exports.install = function () {
     return globe.setImmediate.bind(globe);
 };
+
 });
 require.register("immediate/lib/nextTick.js", function(exports, require, module){
 "use strict";
@@ -391,7 +392,6 @@ exports.install = function (handle) {
         observer = null;
     }, false);
     return function () {
-        console.log('running');
         element.setAttribute("drainQueue", "drainQueue");
     };
 };
