@@ -203,7 +203,7 @@ require.relative = function(parent) {
 require.register("immediate/lib/index.js", function(exports, require, module){
 "use strict";
 var types = [
-    require("./realSetImmediate"),
+    //require("./realSetImmediate"),
     require("./nextTick"),
     require("./mutation"),
     require("./postMessage"),
@@ -256,7 +256,7 @@ require.register("immediate/lib/realSetImmediate.js", function(exports, require,
 "use strict";
 var globe = require("./global");
 exports.test = function () {
-    return false;
+    return  globe.setImmediate;
 };
 
 exports.install = function () {
