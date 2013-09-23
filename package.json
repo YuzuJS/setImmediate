@@ -18,7 +18,8 @@
   "scripts": {
     "test": "mocha test/tests.js -R nyan",
     "test-browser-only": "opener http://localhost:9007/test/browserOnly/index.html && http-server . -p 9007",
-    "build": "component build -o dist -n immediate -s immediate"
+    "build": "component build -o dist -n immediate -s immediate",
+    "amd": "component build -o dist -R -n main"
   },
   "devDependencies": {
     "jshint": "~1.1",
