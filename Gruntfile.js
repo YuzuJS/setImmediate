@@ -18,8 +18,8 @@ module.exports = function(grunt) {
                 mangle: true
             },
             all: {
-                src: "dist/immediate.js",
-                dest: 'dist/min.js'
+                src: "dist/<%= pkg.name %>.js",
+                dest: 'dist/<%= pkg.name %>.min.js'
             }
         }
     });
