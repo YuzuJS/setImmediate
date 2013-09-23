@@ -1,7 +1,4 @@
-<a href="https://ci.testling.com/calvinmetcalf/setImmediate">
-    <img src="https://ci.testling.com/calvinmetcalf/setImmediate.png" alt="Testling-CI badge showing browser compliance"
-         align="right">
-</a>
+
 
 ## Introduction
 
