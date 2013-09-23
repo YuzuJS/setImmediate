@@ -2,7 +2,7 @@
   "name": "immediate",
   "repo": "calvinmetcalf/setImmediate",
   "description": "A shim for the setImmediate efficient script yielding API",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "keywords": [],
   "development": {},
   "license": "MIT",
@@ -15,6 +15,7 @@
     "lib/stateChange.js",
     "lib/timeout.js",
     "lib/global.js",
-    "lib/mutation.js"
+    "lib/mutation.js",
+    "lib/realSetImmediate.js"
   ]
 }

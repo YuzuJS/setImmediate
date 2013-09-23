@@ -201,6 +201,7 @@ require.register("immediate/lib/index.js", function(exports, require, module){
 var types = [
     require("./nextTick"),
     require("./mutation"),
+    require("./realSetImmediate"),
     require("./postMessage"),
     require("./messageChannel"),
     require("./stateChange"),
@@ -379,6 +380,19 @@ exports.install = function (handle) {
         element.setAttribute("drainQueue", "drainQueue");
     };
 };
+});
+require.register("immediate/lib/realSetImmediate.js", function(exports, require, module){
+"use strict";
+var globe = require("./global");
+exports.test = function () {
+    return  globe.setImmediate;
+};
+
+exports.install = function (handle) {
+    //return globe.setImmediate.bind(globe, handle);
+    return globe.setTimeout.bind(globe,handle,0);
+};
+
 });
 require.alias("immediate/lib/index.js", "immediate/index.js");
 
