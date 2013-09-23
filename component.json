@@ -9,7 +9,6 @@
   "main": "lib/index.js",
   "scripts": [
     "lib/index.js",
-    "lib/realSetImmediate.js",
     "lib/nextTick.js",
     "lib/postMessage.js",
     "lib/messageChannel.js",

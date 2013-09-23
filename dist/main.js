@@ -1,7 +1,6 @@
 require.register("immediate/lib/index.js", function(exports, require, module){
 "use strict";
 var types = [
-    //require("./realSetImmediate"),
     require("./nextTick"),
     require("./mutation"),
     require("./postMessage"),
@@ -48,18 +47,6 @@ retFunc.clear = function (n) {
     return this;
 };
 module.exports = retFunc;
-
-});
-require.register("immediate/lib/realSetImmediate.js", function(exports, require, module){
-"use strict";
-var globe = require("./global");
-exports.test = function () {
-    return  globe.setImmediate;
-};
-
-exports.install = function () {
-    return globe.setImmediate.bind(globe);
-};
 
 });
 require.register("immediate/lib/nextTick.js", function(exports, require, module){
