@@ -27,14 +27,10 @@ function require(path, parent, orig) {
   // perform real require()
   // by invoking the module's
   // registered function
-  if (!module._resolving && !module.exports) {
-    var mod = {};
-    mod.exports = {};
-    mod.client = mod.component = true;
-    module._resolving = true;
-    module.call(this, mod.exports, require.relative(resolved), mod);
-    delete module._resolving;
-    module.exports = mod.exports;
+  if (!module.exports) {
+    module.exports = {};
+    module.client = module.component = true;
+    module.call(this, module.exports, require.relative(resolved), module);
   }
 
   return module.exports;
@@ -384,7 +380,9 @@ exports.install = function (handle) {
     };
 };
 });
-require.alias("immediate/lib/index.js", "immediate/index.js");if (typeof exports == "object") {
+require.alias("immediate/lib/index.js", "immediate/index.js");
+
+if (typeof exports == "object") {
   module.exports = require("immediate");
 } else if (typeof define == "function" && define.amd) {
   define(function(){ return require("immediate"); });
