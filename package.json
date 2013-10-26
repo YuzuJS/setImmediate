@@ -1,7 +1,7 @@
 {
   "name": "immediate",
   "description": "A polyfill for the setImmediate efficient script yielding API",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "contributors": [
     "Domenic Denicola <domenic@domenicdenicola.com> (http://domenicdenicola.com)",
     "Donavon West <github@donavon.com> (http://donavon.com)",
@@ -32,24 +32,9 @@
     "grunt-saucelabs": "~4.1.2",
     "grunt-contrib-jshint": "~0.7.0",
     "mocha": "~1.13.0",
-    "chai": "~1.8.1"
+    "grunt-cli": "~0.1.9"
   },
   "jam": {
     "main": "dist/immediate.js"
-  },
-  "testling": {
-    "browsers": [
-      "ie/6..latest",
-      "firefox/3..5",
-      "firefox/19..nightly",
-      "chrome/4..7",
-      "chrome/24..canary",
-      "opera/10..next",
-      "safari/4..latest",
-      "iphone/6",
-      "ipad/6"
-    ],
-    "harness": "mocha",
-    "files": "test/tests.js"
   }
 }
