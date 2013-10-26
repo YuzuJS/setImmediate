@@ -1,27 +1,28 @@
-"use strict";
-/*global setImmediate: false, clearImmediate: false, specify: false, window: false */
+ mocha.setup({
+        ui: "bdd"
+    });
+var assert = chai.assert;
+describe('imediate',function(){
 
-var assert = require("assert");
-var setImmediate = require("../dist/immediate");
-var clearImmediate = setImmediate.clear;
-specify("Handlers do execute", function (done) {
-    setImmediate(function () {
+
+it("Handlers do execute", function (done) {
+    immediate(function () {
         done();
     });
 });
 
-specify("Handlers do not execute in the same event loop turn as the call to `setImmediate`", function (done) {
+it("Handlers do not execute in the same event loop turn as the call to `setImmediate`", function (done) {
     var handlerCalled = false;
     function handler() {
         handlerCalled = true;
         done();
     }
 
-    setImmediate(handler);
+    immediate(handler);
     assert(!handlerCalled);
 });
 
-specify("`setImmediate` passes through an argument to the handler", function (done) {
+it(" passes through an argument to the handler", function (done) {
     var expectedArg = { expected: true };
 
     function handler(actualArg) {
@@ -29,10 +30,10 @@ specify("`setImmediate` passes through an argument to the handler", function (do
         done();
     }
 
-    setImmediate(handler, expectedArg);
+    immediate(handler, expectedArg);
 });
 
-specify("`setImmediate` passes through two arguments to the handler", function (done) {
+it(" passes through two arguments to the handler", function (done) {
     var expectedArg1 = { arg1: true };
     var expectedArg2 = { arg2: true };
 
@@ -42,17 +43,18 @@ specify("`setImmediate` passes through two arguments to the handler", function (
         done();
     }
 
-    setImmediate(handler, expectedArg1, expectedArg2);
+    immediate(handler, expectedArg1, expectedArg2);
 });
-
-specify("`clearImmediate` within the same event loop turn prevents the handler from executing", function (done) {
+});
+describe('clear',function(){
+it(" within the same event loop turn prevents the handler from executing", function (done) {
     var handlerCalled = false;
     function handler() {
         handlerCalled = true;
     }
 
-    var handle = setImmediate(handler);
-    clearImmediate(handle);
+    var handle = immediate(handler);
+    immediate.clear(handle);
 
     setTimeout(function () {
         assert(!handlerCalled);
@@ -60,21 +62,22 @@ specify("`clearImmediate` within the same event loop turn prevents the handler f
     }, 100);
 });
 
-specify("`clearImmediate` does not interfere with handlers other than the one with ID passed to it", function (done) {
+it(" does not interfere with handlers other than the one with ID passed to it", function (done) {
     var expectedArgs = ["A", "D"];
     var recordedArgs = [];
     function handler(arg) {
         recordedArgs.push(arg);
     }
 
-    setImmediate(handler, "A");
-    clearImmediate(setImmediate(handler, "B"));
-    var handle = setImmediate(handler, "C");
-    setImmediate(handler, "D");
-    clearImmediate(handle);
+    immediate(handler, "A");
+    immediate.clear(immediate(handler, "B"));
+    var handle = immediate(handler, "C");
+    immediate(handler, "D");
+    immediate.clear(handle);
 
     setTimeout(function () {
         assert.deepEqual(recordedArgs, expectedArgs);
         done();
     }, 100);
+});
 });
