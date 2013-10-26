@@ -4,10 +4,11 @@ module.exports = function(grunt) {
         browserify: {
             dist: {
                 files: {
-                    'dist/'<%= pkg.name %>'.js': ["lib/index.js"],
+                    'dist/<%= pkg.name %>.js': ["lib/index.js"],
                 },
                 options: {
-                    standalone: '<%= pkg.name %>'
+                    standalone: '<%= pkg.name %>',
+                    noParse:['lib/nextTick.js']
                 }
             }
         },

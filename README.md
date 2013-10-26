@@ -4,7 +4,7 @@
 
 **immediate.js** is a cross between [NobleJS's setImmediate](https://github.com/NobleJS/setImmediate), [Cujo's When](https://github.com/cujojs/when), and [RSVP][RSVP].
 
-immediate takes the tricks from setImmedate and combines them with the schedualer from when to make a 
+immediate takes the tricks from setImmedate and RSVP and combines them with the schedualer from when to make a low latency polyfill.
 
 ## The Tricks
 
@@ -62,9 +62,6 @@ var immediate = require("immediate");
 
 somewhere early in your app; it attaches to the global.
 
-## Demo
-
-* [Quick sort demo][cross-browser-demo]
  
 ## Reference and Reading
 
@@ -72,6 +69,7 @@ somewhere early in your app; it attaches to the global.
  * [W3C mailing list post introducing the specification][list-post]
  * [IE Test Drive demo][ie-demo]
  * [Introductory blog post by Nicholas C. Zakas][ncz]
+ * I wrote a couple blog pots on this, [part 1][my-blog-1] and [part 2][my-blog-2]
 
 [RSVP]: https://github.com/tildeio/rsvp.js
 [spec]: https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/setImmediate/Overview.html
@@ -82,3 +80,5 @@ somewhere early in your app; it attaches to the global.
 [postMessage]: http://www.whatwg.org/specs/web-apps/current-work/multipage/web-messaging.html#posting-messages
 [MessageChannel]: http://www.whatwg.org/specs/web-apps/current-work/multipage/web-messaging.html#channel-messaging
 [cross-browser-demo]: http://calvinmetcalf.github.io/setImmediate-shim-demo
+[my-blog-1]:http://calvinmetcalf.com/post/61672207151/setimmediate-etc
+[my-blog-2]:http://calvinmetcalf.com/post/61761231881/javascript-schedulers
