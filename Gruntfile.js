@@ -7,8 +7,7 @@ module.exports = function(grunt) {
                     'dist/<%= pkg.name %>.js': ["lib/index.js"],
                 },
                 options: {
-                    standalone: '<%= pkg.name %>',
-                    noParse:['lib/nextTick.js']
+                    standalone: '<%= pkg.name %>'
                 }
             }
         },
