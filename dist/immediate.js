@@ -18,7 +18,28 @@ var types = [
     require("./timeout")
 ];
 var handlerQueue = [];
+if (!Array.prototype.some) {
+    Array.prototype.some = function some(fun /*, thisp */) {
+        var object = toObject(this),
+            self = splitString && _toString(this) == "[object String]" ?
+                this.split("") :
+                object,
+            length = self.length >>> 0,
+            thisp = arguments[1];
 
+        // If no callback function or if callback is not a callable function
+        if (_toString(fun) != "[object Function]") {
+            throw new TypeError(fun + " is not a function");
+        }
+
+        for (var i = 0; i < length; i++) {
+            if (i in self && fun.call(thisp, self[i], i, object)) {
+                return true;
+            }
+        }
+        return false;
+    };
+}
 function drainQueue() {
     var i = 0,
         task,
@@ -143,8 +164,7 @@ exports.test = function () {
 };
 
 exports.install = function (handle) {
-    //return globe.setImmediate.bind(globe, handle);
-    return globe.setTimeout.bind(globe,handle,0);
+    return globe.setTimeout.bind(globe, handle, 0);
 };
 
 },{"./global":2}],8:[function(require,module,exports){

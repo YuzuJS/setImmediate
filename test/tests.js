@@ -1,7 +1,6 @@
  mocha.setup({
         ui: "bdd"
     });
-var assert = chai.assert;
 describe('imediate',function(){
 
 
