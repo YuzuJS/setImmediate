@@ -1,14 +1,13 @@
 module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        component: {
-            build: {
+        browserify: {
+            dist: {
+                files: {
+                    'dist/'<%= pkg.name %>'.js': ["lib/index.js"],
+                },
                 options: {
-                    args: {
-                        out: 'dist',
-                        name: '<%= pkg.name %>',
-                        standalone: '<%= pkg.name %>'
-                    }
+                    standalone: '<%= pkg.name %>'
                 }
             }
         },
@@ -23,7 +22,7 @@ module.exports = function(grunt) {
             }
         }
     });
-    grunt.loadNpmTasks('grunt-component');
+    grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.registerTask('default', ['component', 'uglify']);
+    grunt.registerTask('default', ['browserify', 'uglify']);
 }

@@ -1,21 +1,13 @@
 {
   "name": "immediate",
-  "repo": "calvinmetcalf/setImmediate",
-  "description": "A shim for the setImmediate efficient script yielding API",
-  "version": "2.4.3",
+  "repo": "calvinmetcalf/immediate",
+  "description": "A polyfill for the setImmediate efficient script yielding API",
+  "version": "2.5.0",
   "keywords": [],
   "development": {},
   "license": "MIT",
-  "main": "lib/index.js",
+  "main": "dist/immediate.js",
   "scripts": [
-    "lib/index.js",
-    "lib/nextTick.js",
-    "lib/postMessage.js",
-    "lib/messageChannel.js",
-    "lib/stateChange.js",
-    "lib/timeout.js",
-    "lib/global.js",
-    "lib/mutation.js",
-    "lib/realSetImmediate.js"
+   dist/immediate.js
   ]
 }
