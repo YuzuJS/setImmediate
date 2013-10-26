@@ -1,7 +1,7 @@
 {
   "name": "immediate",
   "description": "A polyfill for the setImmediate efficient script yielding API",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "contributors": [
     "Domenic Denicola <domenic@domenicdenicola.com> (http://domenicdenicola.com)",
     "Donavon West <github@donavon.com> (http://donavon.com)",
@@ -13,6 +13,9 @@
     "type": "git",
     "url": "git://github.com/calvinmetcalf/immediate.git"
   },
+  "browser":{
+    "./lib/nextTick.js":"./lib/fakeNextTick.js"
+   },
   "bugs": "https://github.com/calvinmetcalf/immediate/issues",
   "main": "lib/index.js",
   "scripts": {

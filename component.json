@@ -2,7 +2,7 @@
   "name": "immediate",
   "repo": "calvinmetcalf/immediate",
   "description": "A polyfill for the setImmediate efficient script yielding API",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "keywords": [],
   "development": {},
   "license": "MIT",
