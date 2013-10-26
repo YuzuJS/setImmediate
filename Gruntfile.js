@@ -209,6 +209,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-saucelabs');
-    grunt.registerTask('test', ['connect', 'saucelabs-mocha']);
+    grunt.registerTask('test', ['default','connect', 'saucelabs-mocha']);
     grunt.registerTask('default', ['browserify', 'uglify']);
 }
