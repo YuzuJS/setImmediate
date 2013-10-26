@@ -18,6 +18,12 @@ var types = [
     require("./timeout")
 ];
 var handlerQueue = [];
+function toObject(o) {
+    if (o == null) { // this matches both null and undefined
+        throw new TypeError("can't convert "+o+" to object");
+    }
+    return Object(o);
+}
 if (!Array.prototype.some) {
     Array.prototype.some = function some(fun /*, thisp */) {
         var object = toObject(this),
