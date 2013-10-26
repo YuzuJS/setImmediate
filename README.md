@@ -1,4 +1,4 @@
-
+[![Selenium Test Status](https://saucelabs.com/browser-matrix/cw_immediate.svg)](https://saucelabs.com/u/cw_immediate)
 
 ## Introduction
 

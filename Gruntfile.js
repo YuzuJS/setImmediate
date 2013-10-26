@@ -47,57 +47,92 @@ module.exports = function(grunt) {
                         {
                             browserName: 'firefox',
                             platform: 'linux',
+                            version: '6'
+                        },
+                        {
+                            browserName: 'firefox',
+                            platform: 'linux',
+                            version: '7'
+                        },
+                        {
+                            browserName: 'firefox',
+                            platform: 'linux',
+                            version: '8'
+                        },
+                        {
+                            browserName: 'firefox',
+                            platform: 'linux',
+                            version: '9'
+                        },
+                        {
+                            browserName: 'firefox',
+                            platform: 'linux',
+                            version: '10'
+                        },
+                        {
+                            browserName: 'firefox',
+                            platform: 'linux',
+                            version: '11'
+                        },
+                        {
+                            browserName: 'firefox',
+                            platform: 'linux',
+                            version: '12'
+                        },
+                        {
+                            browserName: 'firefox',
+                            platform: 'linux',
+                            version: '13'
+                        },
+                        {
+                            browserName: 'firefox',
+                            platform: 'linux',
+                            version: '14'
+                        },
+                        {
+                            browserName: 'firefox',
+                            platform: 'linux',
+                            version: '15'
+                        },
+                        {
+                            browserName: 'firefox',
+                            platform: 'linux',
+                            version: '16'
+                        },
+                        {
+                            browserName: 'firefox',
+                            platform: 'linux',
                             version: '17'
                         },
                         {
                             browserName: 'firefox',
                             platform: 'linux',
-                            version: '22'
-                     /*  },{
-                           browserName: 'opera',
-                         platform: 'XP',
-                //            version: '9'
-                  //      },{
-                    //        browserName: 'opera',
-                      //      platform: 'XP',
-                      //      version: '10'
-                      //  },{
-                            browserName: 'opera',
-                            platform: 'XP',
-                            version: '11'
-                        },{
-                            browserName: 'opera',
-                            platform: 'XP',
-                            version: '12'
-                        },{
-                            browserName: 'opera',
-                            platform: 'win8',
-                            version: '9'
-                        },{
-                            browserName: 'opera',
-                            platform: 'win8',
-                            version: '10'
-                        },{
-                            browserName: 'opera',
-                            platform: 'win7',
-                            version: '9'
-                        },{
-                            browserName: 'opera',
-                            platform: 'win7',
-                            version: '10'
-                       */ },{
-                            browserName: 'opera',
-                            platform: 'win7',
-                            version: '11'
-                       /* },{
-                            browserName: 'opera',
-                            platform: 'win7',
-                            version: '12'
-                        },{
-                            browserName: 'opera',
+                            version: '18'
+                        },
+                        {
+                            browserName: 'firefox',
                             platform: 'linux',
-                            version: '12'
-                       */ },{
+                            version: '19'
+                        },
+                        {
+                            browserName: 'firefox',
+                            platform: 'linux',
+                            version: '20'
+                        },
+                        {
+                            browserName: 'firefox',
+                            platform: 'linux',
+                            version: '21'
+                        },
+                        {
+                            browserName: 'firefox',
+                            platform: 'linux',
+                            version: '22'
+                        },{
+                            browserName: 'opera',
+                            platform: 'win7',
+                            version: '11'
+                       },{
                             browserName: 'internet explorer',
                             platform: 'WIN8',
                             version: '10'
@@ -127,12 +162,12 @@ module.exports = function(grunt) {
                             platform: 'XP',
                             version: '7'
                         },
-                     /*   {
+                       {
                             browserName: 'internet explorer',
                             platform: 'XP',
                             version: '6'
                         },
-                       */ {
+                        {
                             browserName: "safari",
                             platform: "OS X 10.8",
                             version:'6'
@@ -151,6 +186,26 @@ module.exports = function(grunt) {
                             browserName: "ipad",
                             platform: "OS X 10.8",
                             version:'6'
+                        },
+                         {
+                            browserName: "iphone",
+                            platform: "OS X 10.6",
+                            version:'5'
+                        },
+                        {
+                            browserName: "ipad",
+                            platform: "OS X 10.6",
+                            version:'5'
+                        },
+                         {
+                            browserName: "iphone",
+                            platform: "OS X 10.6",
+                            version:'4'
+                        },
+                        {
+                            browserName: "ipad",
+                            platform: "OS X 10.6",
+                            version:'4'
                         },
                         {
                             browserName: 'chrome',
