@@ -1,5 +1,5 @@
-importScripts("../../setImmediate.js");
+importScripts("../../dist/immediate.js");
 
-setImmediate(function () {
+immediate(function () {
 	self.postMessage("TEST");
 });
