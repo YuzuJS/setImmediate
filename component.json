@@ -8,6 +8,6 @@
   "license": "MIT",
   "main": "dist/immediate.js",
   "scripts": [
-   dist/immediate.js
+   "dist/immediate.js"
   ]
 }
