@@ -67,6 +67,10 @@
                Object.prototype.toString.call(process) === "[object process]";
     }
 
+    function canUsePromise() {
+        return !!global.Promise;
+    }
+
     function canUseMessageChannel() {
         return !!global.MessageChannel;
     }
@@ -99,6 +103,22 @@
             var handle = tasks.addFromSetImmediateArguments(arguments);
 
             process.nextTick(function () {
+                tasks.runIfPresent(handle);
+            });
+
+            return handle;
+        };
+    }
+
+    function installPromiseImplementation(attachTo) {
+        var promise = new global.Promise(function (resolve) {
+            resolve();
+        });
+
+        attachTo.setImmediate = function () {
+            var handle = tasks.addFromSetImmediateArguments(arguments);
+
+            promise.then(function () {
                 tasks.runIfPresent(handle);
             });
 
@@ -199,6 +219,8 @@
         if (canUseNextTick()) {
             // For Node.js before 0.9
             installNextTickImplementation(attachTo);
+        } else if (canUsePromise()) {
+            installPromiseImplementation(attachTo);
         } else if (canUsePostMessage()) {
             // For non-IE10 modern browsers
             installPostMessageImplementation(attachTo);
