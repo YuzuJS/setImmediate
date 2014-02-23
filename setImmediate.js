@@ -215,4 +215,8 @@
 
         attachTo.clearImmediate = tasks.remove;
     }
+    
+    if (typeof module !== 'undefined') {
+        module.exports = global.setImmediate;
+    }
 }(typeof global === "object" && global ? global : this));
