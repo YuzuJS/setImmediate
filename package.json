@@ -13,7 +13,7 @@
     "browsers": [
       "ie/7..latest",
       "chrome/latest",
-      "firefox/3..latest",
+      "firefox/latest",
       "opera/11..latest",
       "safari/latest",
       "iphone/latest",
