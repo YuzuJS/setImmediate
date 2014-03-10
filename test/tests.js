@@ -57,7 +57,7 @@ test("witin the same event loop turn prevents the handler from executing", funct
     }, 100);
 });
 
-test("does not interfere with handlers other than the one wtesth ID passed to test", function (t) {
+test("does not interfere with handlers other than the one with ID passed to it", function (t) {
     var expectedArgs = ["A", "D"];
     var recordedArgs = [];
     function handler(arg) {
