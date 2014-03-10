@@ -78,7 +78,7 @@ test("does not interfere with handlers other than the one wtesth ID passed to te
 
 test("big test", function (t) {
     //mainly for optimizition testing
-    var i = 10000;
+    var i = 10;
     function doStuff() {
         i--;
         if(!i) {
