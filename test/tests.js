@@ -18,7 +18,7 @@ test("Handlers do not execute in the same event loop turn as the call to `setImm
     t.notOk(handlerCalled);
 });
 
-test(" passes through an argument to the handler", function (t) {
+test("passes through an argument to the handler", function (t) {
     var expectedArg = { expected: true };
 
     function handler(actualArg) {
@@ -29,7 +29,7 @@ test(" passes through an argument to the handler", function (t) {
     immediate(handler, expectedArg);
 });
 
-test(" passes through two arguments to the handler", function (t) {
+test("passes through two arguments to the handler", function (t) {
     var expectedArg1 = { arg1: true };
     var expectedArg2 = { arg2: true };
 
@@ -42,7 +42,7 @@ test(" passes through two arguments to the handler", function (t) {
     immediate(handler, expectedArg1, expectedArg2);
 });
 
-test(" witin the same event loop turn prevents the handler from executing", function (t) {
+test("witin the same event loop turn prevents the handler from executing", function (t) {
     var handlerCalled = false;
     function handler() {
         handlerCalled = true;
@@ -57,7 +57,7 @@ test(" witin the same event loop turn prevents the handler from executing", func
     }, 100);
 });
 
-test(" oes not interfere with handlers other than the one wtesth ID passed to test", function (t) {
+test("does not interfere with handlers other than the one wtesth ID passed to test", function (t) {
     var expectedArgs = ["A", "D"];
     var recordedArgs = [];
     function handler(arg) {
@@ -74,4 +74,18 @@ test(" oes not interfere with handlers other than the one wtesth ID passed to te
         t.deepEqual(recordedArgs, expectedArgs);
         t.end();
     }, 100);
+});
+
+test("big test", function (t) {
+    //mainly for optimizition testing
+    var i = 10000;
+    function doStuff() {
+        i--;
+        if(!i) {
+            t.end();
+        } else {
+            immediate(doStuff);
+        }
+    }
+    immediate(doStuff);
 });
