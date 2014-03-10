@@ -1,20 +1,18 @@
-!function(e){"object"==typeof exports?module.exports=e():"function"==typeof define&&define.amd?define(e):"undefined"!=typeof window?window.immediate=e():"undefined"!=typeof global?global.immediate=e():"undefined"!=typeof self&&(self.immediate=e())}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+!function(e){if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.immediate=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 "use strict";
 exports.test = function () {
     return false;
 };
-},{}],2:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};module.exports = typeof global === "object" && global ? global : this;
-},{}],3:[function(require,module,exports){
+},{}],2:[function(_dereq_,module,exports){
 "use strict";
 var types = [
-    require("./nextTick"),
-    require("./mutation"),
-    require("./realSetImmediate"),
-    require("./postMessage"),
-    require("./messageChannel"),
-    require("./stateChange"),
-    require("./timeout")
+    _dereq_("./nextTick"),
+    _dereq_("./mutation"),
+    _dereq_("./realSetImmediate"),
+    _dereq_("./postMessage"),
+    _dereq_("./messageChannel"),
+    _dereq_("./stateChange"),
+    _dereq_("./timeout")
 ];
 var handlerQueue = [];
 function drainQueue() {
@@ -36,11 +34,15 @@ while (++ i < len) {
         break;
     }
 }
-var retFunc = function (task) {
-    var len, args;
+module.exports = function (task) {
+    var len, i, args;
     var nTask = task;
     if (arguments.length > 1 && typeof task === "function") {
-        args = Array.prototype.slice.call(arguments, 1);
+        args = new Array(arguments.length - 1);
+        i = 0;
+        while (++i < arguments.length) {
+            args[i - 1] = arguments[i];
+        }
         nTask = function () {
             task.apply(undefined, args);
         };
@@ -50,35 +52,36 @@ var retFunc = function (task) {
     }
     return len;
 };
-retFunc.clear = function (n) {
+module.exports.clear = function (n) {
     if (n <= handlerQueue.length) {
         handlerQueue[n - 1] = function () {};
     }
     return this;
 };
-module.exports = retFunc;
 
-},{"./messageChannel":4,"./mutation":5,"./nextTick":1,"./postMessage":6,"./realSetImmediate":7,"./stateChange":8,"./timeout":9}],4:[function(require,module,exports){
+},{"./messageChannel":3,"./mutation":4,"./nextTick":1,"./postMessage":5,"./realSetImmediate":6,"./stateChange":7,"./timeout":8}],3:[function(_dereq_,module,exports){
+(function (global){
 "use strict";
-var globe = require("./global");
+
 exports.test = function () {
-    return !!globe.MessageChannel;
+    return typeof global.MessageChannel !== "undefined";
 };
 
 exports.install = function (func) {
-    var channel = new globe.MessageChannel();
+    var channel = new global.MessageChannel();
     channel.port1.onmessage = func;
     return function () {
         channel.port2.postMessage(0);
     };
 };
-},{"./global":2}],5:[function(require,module,exports){
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],4:[function(_dereq_,module,exports){
+(function (global){
 "use strict";
 //based off rsvp
 //https://github.com/tildeio/rsvp.js/blob/master/lib/rsvp/async.js
-var globe = require("./global");
 
-var MutationObserver = globe.MutationObserver || globe.WebKitMutationObserver;
+var MutationObserver = global.MutationObserver || global.WebKitMutationObserver;
 
 exports.test = function () {
     return MutationObserver;
@@ -86,11 +89,11 @@ exports.test = function () {
 
 exports.install = function (handle) {
     var observer = new MutationObserver(handle);
-    var element = globe.document.createElement("div");
+    var element = global.document.createElement("div");
     observer.observe(element, { attributes: true });
 
     // Chrome Memory Leak: https://bugs.webkit.org/show_bug.cgi?id=93661
-    globe.addEventListener("unload", function () {
+    global.addEventListener("unload", function () {
         observer.disconnect();
         observer = null;
     }, false);
@@ -98,24 +101,25 @@ exports.install = function (handle) {
         element.setAttribute("drainQueue", "drainQueue");
     };
 };
-},{"./global":2}],6:[function(require,module,exports){
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],5:[function(_dereq_,module,exports){
+(function (global){
 "use strict";
-var globe = require("./global");
 exports.test = function () {
     // The test against `importScripts` prevents this implementation from being installed inside a web worker,
     // where `global.postMessage` means something completely different and can"t be used for this purpose.
 
-    if (!globe.postMessage || globe.importScripts) {
+    if (!global.postMessage || global.importScripts) {
         return false;
     }
 
     var postMessageIsAsynchronous = true;
-    var oldOnMessage = globe.onmessage;
-    globe.onmessage = function () {
+    var oldOnMessage = global.onmessage;
+    global.onmessage = function () {
         postMessageIsAsynchronous = false;
     };
-    globe.postMessage("", "*");
-    globe.onmessage = oldOnMessage;
+    global.postMessage("", "*");
+    global.onmessage = oldOnMessage;
 
     return postMessageIsAsynchronous;
 };
@@ -123,35 +127,39 @@ exports.test = function () {
 exports.install = function (func) {
     var codeWord = "com.calvinmetcalf.setImmediate" + Math.random();
     function globalMessage(event) {
-        if (event.source === globe && event.data === codeWord) {
+        if (event.source === global && event.data === codeWord) {
             func();
         }
     }
-    if (globe.addEventListener) {
-        globe.addEventListener("message", globalMessage, false);
+    if (global.addEventListener) {
+        global.addEventListener("message", globalMessage, false);
     } else {
-        globe.attachEvent("onmessage", globalMessage);
+        global.attachEvent("onmessage", globalMessage);
     }
     return function () {
-        globe.postMessage(codeWord, "*");
+        global.postMessage(codeWord, "*");
     };
 };
-},{"./global":2}],7:[function(require,module,exports){
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],6:[function(_dereq_,module,exports){
+(function (global){
 "use strict";
-var globe = require("./global");
+
 exports.test = function () {
-    return  globe.setImmediate;
+    return  global.setImmediate;
 };
 
 exports.install = function (handle) {
-    return globe.setTimeout.bind(globe, handle, 0);
+    return global.setTimeout.bind(global, handle, 0);
 };
 
-},{"./global":2}],8:[function(require,module,exports){
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],7:[function(_dereq_,module,exports){
+(function (global){
 "use strict";
-var globe = require("./global");
+
 exports.test = function () {
-    return "document" in globe && "onreadystatechange" in globe.document.createElement("script");
+    return "document" in global && "onreadystatechange" in global.document.createElement("script");
 };
 
 exports.install = function (handle) {
@@ -159,7 +167,7 @@ exports.install = function (handle) {
 
         // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
         // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
-        var scriptEl = globe.document.createElement("script");
+        var scriptEl = global.document.createElement("script");
         scriptEl.onreadystatechange = function () {
             handle();
 
@@ -167,12 +175,13 @@ exports.install = function (handle) {
             scriptEl.parentNode.removeChild(scriptEl);
             scriptEl = null;
         };
-        globe.document.documentElement.appendChild(scriptEl);
+        global.document.documentElement.appendChild(scriptEl);
 
         return handle;
     };
 };
-},{"./global":2}],9:[function(require,module,exports){
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],8:[function(_dereq_,module,exports){
 "use strict";
 exports.test = function () {
     return true;
@@ -183,7 +192,6 @@ exports.install = function (t) {
         setTimeout(t, 0);
     };
 };
-},{}]},{},[3])
-(3)
+},{}]},{},[2])
+(2)
 });
-;
