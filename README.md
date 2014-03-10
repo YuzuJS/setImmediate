@@ -1,4 +1,4 @@
-![testling status](https://ci.testling.com/calvinmetcalf/immediate.png)
+[![testling status](https://ci.testling.com/calvinmetcalf/immediate.png)](https://ci.testling.com/calvinmetcalf/immediate)
 
 ## Introduction
 
