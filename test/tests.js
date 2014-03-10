@@ -3,6 +3,7 @@ var immediate = require("../lib");
 
 test("Handlers do execute", function (t) {
     immediate(function () {
+        t.ok(true, 'handler executed');
         t.end();
     });
 });
@@ -11,6 +12,7 @@ test("Handlers do not execute in the same event loop turn as the call to `setImm
     var handlerCalled = false;
     function handler() {
         handlerCalled = true;
+        t.ok(true, 'handler called');
         t.end();
     }
 
@@ -82,6 +84,7 @@ test("big test", function (t) {
     function doStuff() {
         i--;
         if(!i) {
+            t.ok(true, 'big one works');
             t.end();
         } else {
             immediate(doStuff);
