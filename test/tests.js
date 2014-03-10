@@ -1,52 +1,50 @@
- mocha.setup({
-        ui: "bdd"
-    });
-describe('imediate',function(){
+var test = require('tape');
+var immediate = require("../lib");
 
-
-it("Handlers do execute", function (done) {
+test("Handlers do execute", function (t) {
     immediate(function () {
-        done();
+        t.ok(true, 'handler executed');
+        t.end();
     });
 });
 
-it("Handlers do not execute in the same event loop turn as the call to `setImmediate`", function (done) {
+test("Handlers do not execute in the same event loop turn as the call to `setImmediate`", function (t) {
     var handlerCalled = false;
     function handler() {
         handlerCalled = true;
-        done();
+        t.ok(true, 'handler called');
+        t.end();
     }
 
     immediate(handler);
-    assert(!handlerCalled);
+    t.notOk(handlerCalled);
 });
 
-it(" passes through an argument to the handler", function (done) {
+test("passes through an argument to the handler", function (t) {
     var expectedArg = { expected: true };
 
     function handler(actualArg) {
-        assert.strictEqual(actualArg, expectedArg);
-        done();
+        t.equal(actualArg, expectedArg);
+        t.end();
     }
 
     immediate(handler, expectedArg);
 });
 
-it(" passes through two arguments to the handler", function (done) {
+test("passes through two arguments to the handler", function (t) {
     var expectedArg1 = { arg1: true };
     var expectedArg2 = { arg2: true };
 
     function handler(actualArg1, actualArg2) {
-        assert.strictEqual(actualArg1, expectedArg1);
-        assert.strictEqual(actualArg2, expectedArg2);
-        done();
+        t.equal(actualArg1, expectedArg1);
+        t.equal(actualArg2, expectedArg2);
+        t.end();
     }
 
     immediate(handler, expectedArg1, expectedArg2);
 });
-});
-describe('clear',function(){
-it(" within the same event loop turn prevents the handler from executing", function (done) {
+
+test("witin the same event loop turn prevents the handler from executing", function (t) {
     var handlerCalled = false;
     function handler() {
         handlerCalled = true;
@@ -56,12 +54,12 @@ it(" within the same event loop turn prevents the handler from executing", funct
     immediate.clear(handle);
 
     setTimeout(function () {
-        assert(!handlerCalled);
-        done();
+        t.notOk(handlerCalled);
+        t.end();
     }, 100);
 });
 
-it(" does not interfere with handlers other than the one with ID passed to it", function (done) {
+test("does not interfere with handlers other than the one with ID passed to it", function (t) {
     var expectedArgs = ["A", "D"];
     var recordedArgs = [];
     function handler(arg) {
@@ -75,8 +73,22 @@ it(" does not interfere with handlers other than the one with ID passed to it", 
     immediate.clear(handle);
 
     setTimeout(function () {
-        assert.deepEqual(recordedArgs, expectedArgs);
-        done();
+        t.deepEqual(recordedArgs, expectedArgs);
+        t.end();
     }, 100);
 });
+
+test("big test", function (t) {
+    //mainly for optimizition testing
+    var i = 10;
+    function doStuff() {
+        i--;
+        if(!i) {
+            t.ok(true, 'big one works');
+            t.end();
+        } else {
+            immediate(doStuff);
+        }
+    }
+    immediate(doStuff);
 });

@@ -1,4 +1,4 @@
-[![Selenium Test Status](https://saucelabs.com/browser-matrix/cw_immediate.svg)](https://saucelabs.com/u/cw_immediate)
+[![testling status](https://ci.testling.com/calvinmetcalf/immediate.png)](https://ci.testling.com/calvinmetcalf/immediate)
 
 ## Introduction
 
