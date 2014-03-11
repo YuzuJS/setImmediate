@@ -8,7 +8,6 @@ exports.test = function () {
 var types = [
     _dereq_("./nextTick"),
     _dereq_("./mutation"),
-    _dereq_("./realSetImmediate"),
     _dereq_("./postMessage"),
     _dereq_("./messageChannel"),
     _dereq_("./stateChange"),
@@ -59,7 +58,7 @@ module.exports.clear = function (n) {
     return this;
 };
 
-},{"./messageChannel":3,"./mutation":4,"./nextTick":1,"./postMessage":5,"./realSetImmediate":6,"./stateChange":7,"./timeout":8}],3:[function(_dereq_,module,exports){
+},{"./messageChannel":3,"./mutation":4,"./nextTick":1,"./postMessage":5,"./stateChange":6,"./timeout":7}],3:[function(_dereq_,module,exports){
 (function (global){
 "use strict";
 
@@ -146,19 +145,6 @@ exports.install = function (func) {
 "use strict";
 
 exports.test = function () {
-    return  global.setImmediate;
-};
-
-exports.install = function (handle) {
-    return global.setTimeout.bind(global, handle, 0);
-};
-
-}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],7:[function(_dereq_,module,exports){
-(function (global){
-"use strict";
-
-exports.test = function () {
     return "document" in global && "onreadystatechange" in global.document.createElement("script");
 };
 
@@ -181,7 +167,7 @@ exports.install = function (handle) {
     };
 };
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],8:[function(_dereq_,module,exports){
+},{}],7:[function(_dereq_,module,exports){
 "use strict";
 exports.test = function () {
     return true;
