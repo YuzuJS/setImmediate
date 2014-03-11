@@ -2,15 +2,18 @@
 
 ## Introduction
 
-**immediate.js** is a cross between [NobleJS's setImmediate](https://github.com/NobleJS/setImmediate), [Cujo's When](https://github.com/cujojs/when), and [RSVP][RSVP].
+**immediate.js** is a setImmediate polyfill, based on [NobleJS's setImmediate](https://github.com/NobleJS/setImmediate), but stealing the best ideas from [Cujo's When](https://github.com/cujojs/when) and [RSVP][RSVP].
 
 immediate takes the tricks from setImmedate and RSVP and combines them with the schedualer from when to make a low latency polyfill.
 
 ## The Tricks
 
+### `setImmediate`
+Node.js has had a working version of setImmediate since version 0.9, so on Node.js we use that. But in Internet Explorer 10 which has a broken version of setImmediate we avoid using this.
+
 ### `process.nextTick`
 
-In Node.js versions below 0.9, `setImmediate` is not available, but [`process.nextTick`][nextTIck] is, so we use it to
+In Node.js versions below 0.9, `setImmediate` is not available, but [`process.nextTick`][nextTick] is, so we use it to
 shim support for a global `setImmediate`. In Node.js 0.9 and above, `setImmediate` is available.
 
 Note that we check for *actual* Node.js environments, not emulated ones like those produced by browserify or similar.
