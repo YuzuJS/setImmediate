@@ -1,6 +1,6 @@
 {
   "name": "immediate",
-  "version": "2.6.2",
+  "version": "2.6.3",
   "homepage": "https://github.com/calvinmetcalf/immediate",
   "authors": [
     "Domenic Denicola <domenic@domenicdenicola.com> (http://domenicdenicola.com)",
@@ -9,12 +9,5 @@
     "Calvin Metcalf <calvin.metcalf@gmail.com>"
   ],
   "main": "dist/immediate.js",
-  "license": "MIT",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ]
+  "license": "MIT"
 }
