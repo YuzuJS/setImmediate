@@ -14,8 +14,8 @@
       "ie/6..latest",
       "chrome/latest",
       "firefox/3..latest",
-      "opera/11..latest",
-      "safari/latest",
+      "opera/10..latest",
+      "safari/4..latest",
       "iphone/latest",
       "ipad/latest",
       "android-browser/latest"
