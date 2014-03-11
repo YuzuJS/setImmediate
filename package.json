@@ -1,7 +1,7 @@
 {
   "name": "immediate",
   "description": "A polyfill for the setImmediate efficient script yielding API",
-  "version": "2.6.1",
+  "version": "2.6.2",
   "contributors": [
     "Domenic Denicola <domenic@domenicdenicola.com> (http://domenicdenicola.com)",
     "Donavon West <github@donavon.com> (http://donavon.com)",
@@ -33,7 +33,7 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "npm run build-js && npm run uglify",
-    "uglify" : "uglifyjs dist/immediate.js -mc > dist/immediate.min.js",
+    "uglify": "uglifyjs dist/immediate.js -mc > dist/immediate.min.js",
     "build-js": "browserify -s immediate ./lib/index.js > dist/immediate.js",
     "test": "jshint lib/*.js && node test/tests.js && browserify test/tests.js | testling"
   },
