@@ -1,6 +1,6 @@
 {
   "name": "immediate",
-  "version": "2.6.4",
+  "version": "2.6.5",
   "description": "A polyfill for the setImmediate efficient script yielding API",
   "contributors": [
     "Domenic Denicola <domenic@domenicdenicola.com> (http://domenicdenicola.com)",

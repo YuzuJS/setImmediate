@@ -1,6 +1,6 @@
 {
   "name": "immediate",
-  "version": "2.6.3",
+  "version": "2.6.5",
   "description": "A polyfill for the setImmediate efficient script yielding API",
   "repo": "calvinmetcalf/immediate",
   "keywords": [],
