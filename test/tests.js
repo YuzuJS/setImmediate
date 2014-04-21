@@ -92,7 +92,7 @@ test("big test", function (t) {
     }
     immediate(doStuff);
 });
-if (process.browser) {
+if (process.browser && typeof Worker !== 'undefined') {
   test("worker", function (t) {
     var worker = new Worker('./worker.js');
     worker.postmessage('ping');
