@@ -1,39 +1,28 @@
-<a href="https://ci.testling.com/NobleJS/setImmediate">
-    <img src="https://ci.testling.com/NobleJS/setImmediate.png" alt="Testling-CI badge showing browser compliance"
-         align="right">
-</a>
-
-# setImmediate.js
-**A NobleJS production**
+[![testling status](https://ci.testling.com/calvinmetcalf/immediate.png)](https://ci.testling.com/calvinmetcalf/immediate)
 
 ## Introduction
 
-**setImmediate.js** is a highly cross-browser implementation of the `setImmediate` and `clearImmediate` APIs, currently
-a [W3C draft spec][spec] from the Web Performance Working Group. `setImmediate` allows scripts to yield to the browser,
-executing a given operation asynchronously, in a manner that is typically more efficient and consumes less power than
-the usual `setTimeout(..., 0)` pattern.
+**immediate.js** is a setImmediate polyfill, based on [NobleJS's setImmediate](https://github.com/NobleJS/setImmediate), but stealing the best ideas from [Cujo's When](https://github.com/cujojs/when) and [RSVP][RSVP].
 
-setImmediate.js runs at “full speed” in the following browsers and environments, using various clever tricks:
-
- * Internet Explorer 6+
- * Firefox 3+
- * WebKit
- * Opera 9.5+
- * Node.js
- * Web workers in browsers that support `MessageChannel`, which I can't find solid info on.
-
-In all other browsers we fall back to using `setTimeout`, so it's always safe to use.
+immediate takes the tricks from setImmedate and RSVP and combines them with the schedualer from when to make a low latency polyfill.
 
 ## The Tricks
 
+### `setImmediate`
+Node.js has had a working version of setImmediate since version 0.9, so on Node.js we use that. But in Internet Explorer 10 which has a broken version of setImmediate we avoid using this.
+
 ### `process.nextTick`
 
-In Node.js versions below 0.9, `setImmediate` is not available, but [`process.nextTick`][nextTIck] is, so we use it to
+In Node.js versions below 0.9, `setImmediate` is not available, but [`process.nextTick`][nextTick] is, so we use it to
 shim support for a global `setImmediate`. In Node.js 0.9 and above, `setImmediate` is available.
 
 Note that we check for *actual* Node.js environments, not emulated ones like those produced by browserify or similar.
 Such emulated environments often already include a `process.nextTick` shim that's not as browser-compatible as
 setImmediate.js.
+
+### `MutationObserver`
+
+This is what [RSVP][RSVP] uses, it's very fast, details on [MDN](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver)
 
 ### `postMessage`
 
@@ -58,25 +47,24 @@ turn of the event loop, and is also faster than `setTimeout(…, 0)`, so hey, wh
 
 ## Usage
 
-In the browser, include it with a `<script>` tag; pretty simple.
+In the browser, include it with a `<script>` tag; pretty simple. Creates a global
+called `immediate` which should act like setImmediate. It also has a method called
+`clear` which should act like `clearImmediate`.
 
 In Node.js, do
 
 ```
-npm install setimmediate
+npm install immediate
 ```
 
 then
 
 ```js
-require("setimmediate");
+var immediate = require("immediate");
 ```
 
 somewhere early in your app; it attaches to the global.
 
-## Demo
-
-* [Quick sort demo][cross-browser-demo]
  
 ## Reference and Reading
 
@@ -84,8 +72,9 @@ somewhere early in your app; it attaches to the global.
  * [W3C mailing list post introducing the specification][list-post]
  * [IE Test Drive demo][ie-demo]
  * [Introductory blog post by Nicholas C. Zakas][ncz]
+ * I wrote a couple blog pots on this, [part 1][my-blog-1] and [part 2][my-blog-2]
 
-
+[RSVP]: https://github.com/tildeio/rsvp.js
 [spec]: https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/setImmediate/Overview.html
 [list-post]: http://lists.w3.org/Archives/Public/public-web-perf/2011Jun/0100.html
 [ie-demo]: http://ie.microsoft.com/testdrive/Performance/setImmediateSorting/Default.html
@@ -93,4 +82,6 @@ somewhere early in your app; it attaches to the global.
 [nextTick]: http://nodejs.org/docs/v0.8.16/api/process.html#process_process_nexttick_callback
 [postMessage]: http://www.whatwg.org/specs/web-apps/current-work/multipage/web-messaging.html#posting-messages
 [MessageChannel]: http://www.whatwg.org/specs/web-apps/current-work/multipage/web-messaging.html#channel-messaging
-[cross-browser-demo]: http://jphpsf.github.com/setImmediate-shim-demo
+[cross-browser-demo]: http://calvinmetcalf.github.io/setImmediate-shim-demo
+[my-blog-1]:http://calvinmetcalf.com/post/61672207151/setimmediate-etc
+[my-blog-2]:http://calvinmetcalf.com/post/61761231881/javascript-schedulers

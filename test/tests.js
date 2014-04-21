@@ -1,80 +1,104 @@
-"use strict";
-/*global setImmediate: false, clearImmediate: false, specify: false, window: false */
+var test = require('tape');
+var immediate = require("../lib");
 
-var assert = require("assert");
-require("../setImmediate");
-
-specify("Handlers do execute", function (done) {
-    setImmediate(function () {
-        done();
+test("Handlers do execute", function (t) {
+    immediate(function () {
+        t.ok(true, 'handler executed');
+        t.end();
     });
 });
 
-specify("Handlers do not execute in the same event loop turn as the call to `setImmediate`", function (done) {
+test("Handlers do not execute in the same event loop turn as the call to `setImmediate`", function (t) {
     var handlerCalled = false;
     function handler() {
         handlerCalled = true;
-        done();
+        t.ok(true, 'handler called');
+        t.end();
     }
 
-    setImmediate(handler);
-    assert(!handlerCalled);
+    immediate(handler);
+    t.notOk(handlerCalled);
 });
 
-specify("`setImmediate` passes through an argument to the handler", function (done) {
+test("passes through an argument to the handler", function (t) {
     var expectedArg = { expected: true };
 
     function handler(actualArg) {
-        assert.strictEqual(actualArg, expectedArg);
-        done();
+        t.equal(actualArg, expectedArg);
+        t.end();
     }
 
-    setImmediate(handler, expectedArg);
+    immediate(handler, expectedArg);
 });
 
-specify("`setImmediate` passes through two arguments to the handler", function (done) {
+test("passes through two arguments to the handler", function (t) {
     var expectedArg1 = { arg1: true };
     var expectedArg2 = { arg2: true };
 
     function handler(actualArg1, actualArg2) {
-        assert.strictEqual(actualArg1, expectedArg1);
-        assert.strictEqual(actualArg2, expectedArg2);
-        done();
+        t.equal(actualArg1, expectedArg1);
+        t.equal(actualArg2, expectedArg2);
+        t.end();
     }
 
-    setImmediate(handler, expectedArg1, expectedArg2);
+    immediate(handler, expectedArg1, expectedArg2);
 });
 
-specify("`clearImmediate` within the same event loop turn prevents the handler from executing", function (done) {
+test("witin the same event loop turn prevents the handler from executing", function (t) {
     var handlerCalled = false;
     function handler() {
         handlerCalled = true;
     }
 
-    var handle = setImmediate(handler);
-    clearImmediate(handle);
+    var handle = immediate(handler);
+    immediate.clear(handle);
 
     setTimeout(function () {
-        assert(!handlerCalled);
-        done();
+        t.notOk(handlerCalled);
+        t.end();
     }, 100);
 });
 
-specify("`clearImmediate` does not interfere with handlers other than the one with ID passed to it", function (done) {
+test("does not interfere with handlers other than the one with ID passed to it", function (t) {
     var expectedArgs = ["A", "D"];
     var recordedArgs = [];
     function handler(arg) {
         recordedArgs.push(arg);
     }
 
-    setImmediate(handler, "A");
-    clearImmediate(setImmediate(handler, "B"));
-    var handle = setImmediate(handler, "C");
-    setImmediate(handler, "D");
-    clearImmediate(handle);
+    immediate(handler, "A");
+    immediate.clear(immediate(handler, "B"));
+    var handle = immediate(handler, "C");
+    immediate(handler, "D");
+    immediate.clear(handle);
 
     setTimeout(function () {
-        assert.deepEqual(recordedArgs, expectedArgs);
-        done();
+        t.deepEqual(recordedArgs, expectedArgs);
+        t.end();
     }, 100);
 });
+
+test("big test", function (t) {
+    //mainly for optimizition testing
+    var i = 10;
+    function doStuff() {
+        i--;
+        if(!i) {
+            t.ok(true, 'big one works');
+            t.end();
+        } else {
+            immediate(doStuff);
+        }
+    }
+    immediate(doStuff);
+});
+if (process.browser && typeof Worker !== 'undefined') {
+  test("worker", function (t) {
+    var worker = new Worker('./worker.js');
+    worker.postmessage('ping');
+    worker.onmessage(function (e) {
+      t.equals(e.data, 'pong');
+      t.end();
+    });
+  });
+}

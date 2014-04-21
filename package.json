@@ -1,42 +1,50 @@
 {
-    "name": "setimmediate",
-    "description": "A shim for the setImmediate efficient script yielding API",
-    "version": "1.0.1",
-    "author": "NobleJS",
-    "contributors": [
-        "Domenic Denicola <domenic@domenicdenicola.com> (http://domenicdenicola.com)",
-        "Donavon West <github@donavon.com> (http://donavon.com)",
-        "Yaffle"
-    ],
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/NobleJS/setImmediate.git"
-    },
-    "bugs": "https://github.com/NobleJS/setImmediate/issues",
-    "main": "setImmediate.js",
-    "scripts": {
-        "lint": "jshint setImmediate.js",
-        "test": "mocha test/tests.js",
-        "test-browser-only": "opener http://localhost:9007/test/browserOnly/index.html && http-server . -p 9007"
-    },
-    "devDependencies": {
-        "jshint": "~1.1",
-        "mocha": "1.9.x",
-        "http-server": "~0.5.3",
-        "opener": "~1.3"
-    },
-    "testling": {
-        "browsers": [
-            "ie/6..latest",
-            "firefox/3..5", "firefox/19..nightly",
-            "chrome/4..7", "chrome/24..canary",
-            "opera/10..next",
-            "safari/4..latest",
-            "iphone/6",
-            "ipad/6"
-        ],
-        "harness": "mocha",
-        "files": "test/tests.js"
-    }
+  "name": "immediate",
+  "version": "2.6.5",
+  "description": "A polyfill for the setImmediate efficient script yielding API",
+  "contributors": [
+    "Domenic Denicola <domenic@domenicdenicola.com> (http://domenicdenicola.com)",
+    "Donavon West <github@donavon.com> (http://donavon.com)",
+    "Yaffle",
+    "Calvin Metcalf <calvin.metcalf@gmail.com>"
+  ],
+  "testling": {
+    "files": "test/tests.js",
+    "browsers": [
+      "ie/6..latest",
+      "chrome/latest",
+      "firefox/3..latest",
+      "opera/10..latest",
+      "safari/4..latest",
+      "iphone/latest",
+      "ipad/latest",
+      "android-browser/latest"
+    ]
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/calvinmetcalf/immediate.git"
+  },
+  "browser": {
+    "./lib/nextTick.js": "./lib/fakeNextTick.js"
+  },
+  "bugs": "https://github.com/calvinmetcalf/immediate/issues",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "npm run build-js && npm run uglify",
+    "uglify": "uglifyjs dist/immediate.js -mc > dist/immediate.min.js",
+    "build-js": "browserify -s immediate ./lib/index.js > dist/immediate.js",
+    "test": "jshint lib/*.js && node test/tests.js && browserify test/tests.js | testling"
+  },
+  "devDependencies": {
+    "uglify-js": "^2.4.12",
+    "tape": "^2.10.2",
+    "jshint": "^2.4.4",
+    "testling": "^1.6.1",
+    "browserify": "^3.32.1"
+  },
+  "jam": {
+    "main": "dist/immediate.js"
+  }
 }
