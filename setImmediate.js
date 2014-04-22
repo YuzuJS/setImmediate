@@ -143,4 +143,4 @@
     }
 
     attachTo.clearImmediate = clearImmediate;
-}(typeof global === "object" && global ? global : this));
+}(Function("return this")()));
