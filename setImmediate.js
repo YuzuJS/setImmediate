@@ -5,46 +5,41 @@
         return;
     }
 
-    var tasks = (function () {
-        var nextHandle = 1; // Spec says greater than zero
-        var tasksByHandle = {};
-        var currentlyRunningATask = false;
+    var nextHandle = 1; // Spec says greater than zero
+    var tasksByHandle = {};
+    var currentlyRunningATask = false;
 
-        return {
-            addFromSetImmediateArguments: function (args) {
-                var handler = args[0];
-                var bindArgs = slice.call(args, 1);
-                bindArgs.unshift(handler, undefined);
-                tasksByHandle[nextHandle] = handler.bind.apply(bindArgs);
-                return nextHandle++;
-            },
-            runIfPresent: function (handle) {
-                // From the spec: "Wait until any invocations of this algorithm started before this one have completed."
-                // So if we're currently running a task, we'll need to delay this invocation.
-                if (!currentlyRunningATask) {
-                    var task = tasksByHandle[handle];
-                    if (task) {
-                        currentlyRunningATask = true;
-                        try {
-                            task();
-                        } finally {
-                            delete tasksByHandle[handle];
-                            currentlyRunningATask = false;
-                        }
-                    }
-                } else {
-                    // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
-                    // "too much recursion" error.
-                    global.setTimeout(function () {
-                        tasks.runIfPresent(handle);
-                    }, 0);
+    function addFromSetImmediateArguments(args) {
+        var handler = args[0];
+        args[0] = undefined;
+        tasksByHandle[nextHandle] = handler.bind.apply(handler, args);
+        return nextHandle++;
+    }
+
+    function runIfPresent(handle) {
+        // From the spec: "Wait until any invocations of this algorithm started before this one have completed."
+        // So if we're currently running a task, we'll need to delay this invocation.
+        if (currentlyRunningATask) {
+            // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
+            // "too much recursion" error.
+            global.setTimeout(runIfPresent.bind(undefined, handle), 0);
+        } else {
+            var task = tasksByHandle[handle];
+            if (task) {
+                currentlyRunningATask = true;
+                try {
+                    task();
+                } finally {
+                    clearImmediate(handle);
+                    currentlyRunningATask = false;
                 }
-            },
-            remove: function (handle) {
-                delete tasksByHandle[handle];
             }
-        };
-    }());
+        }
+    }
+
+    function clearImmediate(handle) {
+        delete tasksByHandle[handle];
+    }
 
     function canUseNextTick() {
         // Don't get fooled by e.g. browserify environments.
@@ -81,10 +76,10 @@
 
     function installNextTickImplementation(attachTo) {
         attachTo.setImmediate = function () {
-            var handle = tasks.addFromSetImmediateArguments(arguments);
+            var handle = addFromSetImmediateArguments(arguments);
 
             process.nextTick(function () {
-                tasks.runIfPresent(handle);
+                runIfPresent(handle);
             });
 
             return handle;
@@ -95,10 +90,10 @@
         var channel = new global.MessageChannel();
         channel.port1.onmessage = function (event) {
             var handle = event.data;
-            tasks.runIfPresent(handle);
+            runIfPresent(handle);
         };
         attachTo.setImmediate = function () {
-            var handle = tasks.addFromSetImmediateArguments(arguments);
+            var handle = addFromSetImmediateArguments(arguments);
 
             channel.port2.postMessage(handle);
 
@@ -123,7 +118,7 @@
             // (randomly generated) unpredictable identifying prefix is present.
             if (event.source === global && isStringAndStartsWith(event.data, MESSAGE_PREFIX)) {
                 var handle = event.data.substring(MESSAGE_PREFIX.length);
-                tasks.runIfPresent(handle);
+                runIfPresent(handle);
             }
         }
         if (global.addEventListener) {
@@ -133,7 +128,7 @@
         }
 
         attachTo.setImmediate = function () {
-            var handle = tasks.addFromSetImmediateArguments(arguments);
+            var handle = addFromSetImmediateArguments(arguments);
 
             // Make `global` post a message to itself with the handle and identifying prefix, thus asynchronously
             // invoking our onGlobalMessage listener above.
@@ -145,13 +140,13 @@
 
     function installReadyStateChangeImplementation(attachTo) {
         attachTo.setImmediate = function () {
-            var handle = tasks.addFromSetImmediateArguments(arguments);
+            var handle = addFromSetImmediateArguments(arguments);
 
             // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
             // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
             var scriptEl = global.document.createElement("script");
             scriptEl.onreadystatechange = function () {
-                tasks.runIfPresent(handle);
+                runIfPresent(handle);
 
                 scriptEl.onreadystatechange = null;
                 scriptEl.parentNode.removeChild(scriptEl);
@@ -165,10 +160,10 @@
 
     function installSetTimeoutImplementation(attachTo) {
         attachTo.setImmediate = function () {
-            var handle = tasks.addFromSetImmediateArguments(arguments);
+            var handle = addFromSetImmediateArguments(arguments);
 
             global.setTimeout(function () {
-                tasks.runIfPresent(handle);
+                runIfPresent(handle);
             }, 0);
 
             return handle;
@@ -197,5 +192,5 @@
         installSetTimeoutImplementation(attachTo);
     }
 
-    attachTo.clearImmediate = tasks.remove;
+    attachTo.clearImmediate = clearImmediate;
 }(typeof global === "object" && global ? global : this));
