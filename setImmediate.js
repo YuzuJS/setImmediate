@@ -171,9 +171,9 @@
     }
 
     // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
-    var attachTo = typeof Object.getPrototypeOf === "function" && "setTimeout" in Object.getPrototypeOf(global) ?
-                      Object.getPrototypeOf(global)
-                    : global;
+    var getProto = Object.getPrototypeOf;
+    var attachTo = getProto && getProto(global);
+    attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
 
     if (canUseNextTick()) {
         // For Node.js before 0.9
