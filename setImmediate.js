@@ -1,6 +1,10 @@
 (function (global, undefined) {
     "use strict";
 
+    if (global.setImmediate) {
+        return;
+    }
+
     var tasks = (function () {
         function Task(handler, args) {
             this.handler = handler;
@@ -190,29 +194,27 @@
         };
     }
 
-    if (!global.setImmediate) {
-        // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
-        var attachTo = typeof Object.getPrototypeOf === "function" && "setTimeout" in Object.getPrototypeOf(global) ?
-                          Object.getPrototypeOf(global)
-                        : global;
+    // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
+    var attachTo = typeof Object.getPrototypeOf === "function" && "setTimeout" in Object.getPrototypeOf(global) ?
+                      Object.getPrototypeOf(global)
+                    : global;
 
-        if (canUseNextTick()) {
-            // For Node.js before 0.9
-            installNextTickImplementation(attachTo);
-        } else if (canUsePostMessage()) {
-            // For non-IE10 modern browsers
-            installPostMessageImplementation(attachTo);
-        } else if (canUseMessageChannel()) {
-            // For web workers, where supported
-            installMessageChannelImplementation(attachTo);
-        } else if (canUseReadyStateChange()) {
-            // For IE 6–8
-            installReadyStateChangeImplementation(attachTo);
-        } else {
-            // For older browsers
-            installSetTimeoutImplementation(attachTo);
-        }
-
-        attachTo.clearImmediate = tasks.remove;
+    if (canUseNextTick()) {
+        // For Node.js before 0.9
+        installNextTickImplementation(attachTo);
+    } else if (canUsePostMessage()) {
+        // For non-IE10 modern browsers
+        installPostMessageImplementation(attachTo);
+    } else if (canUseMessageChannel()) {
+        // For web workers, where supported
+        installMessageChannelImplementation(attachTo);
+    } else if (canUseReadyStateChange()) {
+        // For IE 6–8
+        installReadyStateChangeImplementation(attachTo);
+    } else {
+        // For older browsers
+        installSetTimeoutImplementation(attachTo);
     }
+
+    attachTo.clearImmediate = tasks.remove;
 }(typeof global === "object" && global ? global : this));
