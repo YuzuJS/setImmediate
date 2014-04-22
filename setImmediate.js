@@ -6,23 +6,6 @@
     }
 
     var tasks = (function () {
-        function Task(handler, args) {
-            this.handler = handler;
-            this.args = args;
-        }
-        Task.prototype.run = function () {
-            // See steps in section 5 of the spec.
-            if (typeof this.handler === "function") {
-                // Choice of `thisArg` is not in the setImmediate spec; `undefined` is in the setTimeout spec though:
-                // http://www.whatwg.org/specs/web-apps/current-work/multipage/timers.html
-                this.handler.apply(undefined, this.args);
-            } else {
-                var scriptSource = "" + this.handler;
-                /*jshint evil: true */
-                eval(scriptSource);
-            }
-        };
-
         var nextHandle = 1; // Spec says greater than zero
         var tasksByHandle = {};
         var currentlyRunningATask = false;
@@ -30,12 +13,10 @@
         return {
             addFromSetImmediateArguments: function (args) {
                 var handler = args[0];
-                var argsToHandle = Array.prototype.slice.call(args, 1);
-                var task = new Task(handler, argsToHandle);
-
-                var thisHandle = nextHandle++;
-                tasksByHandle[thisHandle] = task;
-                return thisHandle;
+                var bindArgs = slice.call(args, 1);
+                bindArgs.unshift(handler, undefined);
+                tasksByHandle[nextHandle] = handler.bind.apply(bindArgs);
+                return nextHandle++;
             },
             runIfPresent: function (handle) {
                 // From the spec: "Wait until any invocations of this algorithm started before this one have completed."
@@ -45,7 +26,7 @@
                     if (task) {
                         currentlyRunningATask = true;
                         try {
-                            task.run();
+                            task();
                         } finally {
                             delete tasksByHandle[handle];
                             currentlyRunningATask = false;
