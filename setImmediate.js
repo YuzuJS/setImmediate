@@ -9,6 +9,7 @@
     var tasksByHandle = {};
     var currentlyRunningATask = false;
     var doc = global.document;
+    var setImmediate;
 
     function addFromSetImmediateArguments(args) {
         var handler = args[0];
@@ -65,7 +66,7 @@
     // Don't get fooled by e.g. browserify environments.
     if (Object.prototype.toString.call(global.process) === "[object process]") {
         // For Node.js before 0.9
-        attachTo.setImmediate = function() {
+        setImmediate = function() {
             var handle = addFromSetImmediateArguments(arguments);
             process.nextTick(runIfPresent.bind(undefined, handle));
             return handle;
@@ -95,7 +96,7 @@
         }
 
         // For non-IE10 modern browsers
-        attachTo.setImmediate = function() {
+        setImmediate = function() {
             var handle = addFromSetImmediateArguments(arguments);
             global.postMessage(messagePrefix + handle, origin);
             return handle;
@@ -109,7 +110,7 @@
             runIfPresent(handle);
         };
 
-        attachTo.setImmediate = function() {
+        setImmediate = function() {
             var handle = addFromSetImmediateArguments(arguments);
             channel.port2.postMessage(handle);
             return handle;
@@ -118,7 +119,7 @@
     } else if (doc && "onreadystatechange" in doc.createElement("script")) {
         // For IE 6–8
         var html = doc.documentElement;
-        attachTo.setImmediate = function() {
+        setImmediate = function() {
             var handle = addFromSetImmediateArguments(arguments);
             // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
             // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
@@ -135,12 +136,13 @@
 
     } else {
         // For older browsers
-        attachTo.setImmediate = function() {
+        setImmediate = function() {
             var handle = addFromSetImmediateArguments(arguments);
             global.setTimeout(runIfPresent.bind(undefined, handle), 0);
             return handle;
         };
     }
 
+    attachTo.setImmediate = setImmediate;
     attachTo.clearImmediate = clearImmediate;
 }(Function("return this")()));
