@@ -57,18 +57,6 @@
         }
     }
 
-    function installSetTimeoutImplementation(attachTo) {
-        attachTo.setImmediate = function () {
-            var handle = addFromSetImmediateArguments(arguments);
-
-            global.setTimeout(function () {
-                runIfPresent(handle);
-            }, 0);
-
-            return handle;
-        };
-    }
-
     // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
     var getProto = Object.getPrototypeOf;
     var attachTo = getProto && getProto(global);
@@ -147,7 +135,11 @@
 
     } else {
         // For older browsers
-        installSetTimeoutImplementation(attachTo);
+        attachTo.setImmediate = function() {
+            var handle = addFromSetImmediateArguments(arguments);
+            global.setTimeout(runIfPresent.bind(undefined, handle), 0);
+            return handle;
+        };
     }
 
     attachTo.clearImmediate = clearImmediate;
