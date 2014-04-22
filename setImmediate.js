@@ -8,6 +8,7 @@
     var nextHandle = 1; // Spec says greater than zero
     var tasksByHandle = {};
     var currentlyRunningATask = false;
+    var doc = global.document;
 
     function addFromSetImmediateArguments(args) {
         var handler = args[0];
@@ -54,30 +55,6 @@
             global.onmessage = oldOnMessage;
             return postMessageIsAsynchronous;
         }
-    }
-
-    function canUseReadyStateChange() {
-        return "document" in global && "onreadystatechange" in global.document.createElement("script");
-    }
-
-    function installReadyStateChangeImplementation(attachTo) {
-        attachTo.setImmediate = function () {
-            var handle = addFromSetImmediateArguments(arguments);
-
-            // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
-            // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
-            var scriptEl = global.document.createElement("script");
-            scriptEl.onreadystatechange = function () {
-                runIfPresent(handle);
-
-                scriptEl.onreadystatechange = null;
-                scriptEl.parentNode.removeChild(scriptEl);
-                scriptEl = null;
-            };
-            global.document.documentElement.appendChild(scriptEl);
-
-            return handle;
-        };
     }
 
     function installSetTimeoutImplementation(attachTo) {
@@ -150,9 +127,24 @@
             return handle;
         };
 
-    } else if (canUseReadyStateChange()) {
+    } else if (doc && "onreadystatechange" in doc.createElement("script")) {
         // For IE 6–8
-        installReadyStateChangeImplementation(attachTo);
+        var html = doc.documentElement;
+        attachTo.setImmediate = function() {
+            var handle = addFromSetImmediateArguments(arguments);
+            // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
+            // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
+            var script = doc.createElement("script");
+            script.onreadystatechange = function () {
+                runIfPresent(handle);
+                script.onreadystatechange = null;
+                html.removeChild(script);
+                script = null;
+            };
+            html.appendChild(script);
+            return handle;
+        };
+
     } else {
         // For older browsers
         installSetTimeoutImplementation(attachTo);
