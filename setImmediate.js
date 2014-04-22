@@ -41,10 +41,6 @@
         delete tasksByHandle[handle];
     }
 
-    function canUseMessageChannel() {
-        return !!global.MessageChannel;
-    }
-
     function canUsePostMessage() {
         // The test against `importScripts` prevents this implementation from being installed inside a web worker,
         // where `global.postMessage` means something completely different and can't be used for this purpose.
@@ -62,21 +58,6 @@
 
     function canUseReadyStateChange() {
         return "document" in global && "onreadystatechange" in global.document.createElement("script");
-    }
-
-    function installMessageChannelImplementation(attachTo) {
-        var channel = new global.MessageChannel();
-        channel.port1.onmessage = function (event) {
-            var handle = event.data;
-            runIfPresent(handle);
-        };
-        attachTo.setImmediate = function () {
-            var handle = addFromSetImmediateArguments(arguments);
-
-            channel.port2.postMessage(handle);
-
-            return handle;
-        };
     }
 
     function installReadyStateChangeImplementation(attachTo) {
@@ -155,9 +136,20 @@
             return handle;
         };
 
-    } else if (canUseMessageChannel()) {
+    } else if (global.MessageChannel) {
         // For web workers, where supported
-        installMessageChannelImplementation(attachTo);
+        var channel = new global.MessageChannel();
+        channel.port1.onmessage = function(event) {
+            var handle = event.data;
+            runIfPresent(handle);
+        };
+
+        attachTo.setImmediate = function() {
+            var handle = addFromSetImmediateArguments(arguments);
+            channel.port2.postMessage(handle);
+            return handle;
+        };
+
     } else if (canUseReadyStateChange()) {
         // For IE 6–8
         installReadyStateChangeImplementation(attachTo);
