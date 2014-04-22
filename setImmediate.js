@@ -14,7 +14,9 @@
     function addFromSetImmediateArguments(args) {
         var handler = args[0];
         args[0] = undefined;
-        tasksByHandle[nextHandle] = handler.bind.apply(handler, args);
+        tasksByHandle[nextHandle] = typeof handler === "function"
+            ? handler.bind.apply(handler, args)
+            : eval.bind(undefined, "" + handler);
         return nextHandle++;
     }
 
