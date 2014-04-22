@@ -48,20 +48,16 @@
     function canUsePostMessage() {
         // The test against `importScripts` prevents this implementation from being installed inside a web worker,
         // where `global.postMessage` means something completely different and can't be used for this purpose.
-
-        if (!global.postMessage || global.importScripts) {
-            return false;
+        if (global.postMessage && !global.importScripts) {
+            var postMessageIsAsynchronous = true;
+            var oldOnMessage = global.onmessage;
+            global.onmessage = function() {
+                postMessageIsAsynchronous = false;
+            };
+            global.postMessage("", "*");
+            global.onmessage = oldOnMessage;
+            return postMessageIsAsynchronous;
         }
-
-        var postMessageIsAsynchronous = true;
-        var oldOnMessage = global.onmessage;
-        global.onmessage = function () {
-            postMessageIsAsynchronous = false;
-        };
-        global.postMessage("", "*");
-        global.onmessage = oldOnMessage;
-
-        return postMessageIsAsynchronous;
     }
 
     function canUseReadyStateChange() {
@@ -78,43 +74,6 @@
             var handle = addFromSetImmediateArguments(arguments);
 
             channel.port2.postMessage(handle);
-
-            return handle;
-        };
-    }
-
-    function installPostMessageImplementation(attachTo) {
-        // Installs an event handler on `global` for the `message` event: see
-        // * https://developer.mozilla.org/en/DOM/window.postMessage
-        // * http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#crossDocumentMessages
-
-        var MESSAGE_PREFIX = "com.bn.NobleJS.setImmediate" + Math.random();
-
-        function isStringAndStartsWith(string, putativeStart) {
-            return typeof string === "string" && string.substring(0, putativeStart.length) === putativeStart;
-        }
-
-        function onGlobalMessage(event) {
-            // This will catch all incoming messages (even from other windows!), so we need to try reasonably hard to
-            // avoid letting anyone else trick us into firing off. We test the origin is still this window, and that a
-            // (randomly generated) unpredictable identifying prefix is present.
-            if (event.source === global && isStringAndStartsWith(event.data, MESSAGE_PREFIX)) {
-                var handle = event.data.substring(MESSAGE_PREFIX.length);
-                runIfPresent(handle);
-            }
-        }
-        if (global.addEventListener) {
-            global.addEventListener("message", onGlobalMessage, false);
-        } else {
-            global.attachEvent("onmessage", onGlobalMessage);
-        }
-
-        attachTo.setImmediate = function () {
-            var handle = addFromSetImmediateArguments(arguments);
-
-            // Make `global` post a message to itself with the handle and identifying prefix, thus asynchronously
-            // invoking our onGlobalMessage listener above.
-            global.postMessage(MESSAGE_PREFIX + handle, "*");
 
             return handle;
         };
@@ -167,8 +126,35 @@
         };
 
     } else if (canUsePostMessage()) {
+        // Installs an event handler on `global` for the `message` event: see
+        // * https://developer.mozilla.org/en/DOM/window.postMessage
+        // * http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#crossDocumentMessages
+
+        var loc = global.location;
+        var origin = loc && loc.hostname || "*";
+        var messagePrefix = "setImmediate$" + Math.random() + "$";
+
+        var onGlobalMessage = function(event) {
+            if (event.source === global &&
+                typeof event.data === "string" &&
+                event.data.indexOf(messagePrefix) === 0) {
+                runIfPresent(+event.data.slice(messagePrefix.length));
+            }
+        };
+
+        if (global.addEventListener) {
+            global.addEventListener("message", onGlobalMessage, false);
+        } else {
+            global.attachEvent("onmessage", onGlobalMessage);
+        }
+
         // For non-IE10 modern browsers
-        installPostMessageImplementation(attachTo);
+        attachTo.setImmediate = function() {
+            var handle = addFromSetImmediateArguments(arguments);
+            global.postMessage(messagePrefix + handle, origin);
+            return handle;
+        };
+
     } else if (canUseMessageChannel()) {
         // For web workers, where supported
         installMessageChannelImplementation(attachTo);
