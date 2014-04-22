@@ -41,12 +41,6 @@
         delete tasksByHandle[handle];
     }
 
-    function canUseNextTick() {
-        // Don't get fooled by e.g. browserify environments.
-        return typeof process === "object" &&
-               Object.prototype.toString.call(process) === "[object process]";
-    }
-
     function canUseMessageChannel() {
         return !!global.MessageChannel;
     }
@@ -72,18 +66,6 @@
 
     function canUseReadyStateChange() {
         return "document" in global && "onreadystatechange" in global.document.createElement("script");
-    }
-
-    function installNextTickImplementation(attachTo) {
-        attachTo.setImmediate = function () {
-            var handle = addFromSetImmediateArguments(arguments);
-
-            process.nextTick(function () {
-                runIfPresent(handle);
-            });
-
-            return handle;
-        };
     }
 
     function installMessageChannelImplementation(attachTo) {
@@ -175,9 +157,15 @@
     var attachTo = getProto && getProto(global);
     attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
 
-    if (canUseNextTick()) {
+    // Don't get fooled by e.g. browserify environments.
+    if (Object.prototype.toString.call(global.process) === "[object process]") {
         // For Node.js before 0.9
-        installNextTickImplementation(attachTo);
+        attachTo.setImmediate = function() {
+            var handle = addFromSetImmediateArguments(arguments);
+            process.nextTick(runIfPresent.bind(undefined, handle));
+            return handle;
+        };
+
     } else if (canUsePostMessage()) {
         // For non-IE10 modern browsers
         installPostMessageImplementation(attachTo);
