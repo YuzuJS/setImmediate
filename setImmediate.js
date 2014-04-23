@@ -45,6 +45,14 @@
         delete tasksByHandle[handle];
     }
 
+    function installNextTickImplementation() {
+        setImmediate = function() {
+            var handle = addFromSetImmediateArguments(arguments);
+            process.nextTick(runIfPresent.bind(undefined, handle));
+            return handle;
+        };
+    }
+
     function canUsePostMessage() {
         // The test against `importScripts` prevents this implementation from being installed inside a web worker,
         // where `global.postMessage` means something completely different and can't be used for this purpose.
@@ -60,20 +68,7 @@
         }
     }
 
-    // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
-    var attachTo = Object.getPrototypeOf && Object.getPrototypeOf(global);
-    attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
-
-    // Don't get fooled by e.g. browserify environments.
-    if ({}.toString.call(global.process) === "[object process]") {
-        // For Node.js before 0.9
-        setImmediate = function() {
-            var handle = addFromSetImmediateArguments(arguments);
-            process.nextTick(runIfPresent.bind(undefined, handle));
-            return handle;
-        };
-
-    } else if (canUsePostMessage()) {
+    function installPostMessageImplementation() {
         // Installs an event handler on `global` for the `message` event: see
         // * https://developer.mozilla.org/en/DOM/window.postMessage
         // * http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#crossDocumentMessages
@@ -96,15 +91,14 @@
             global.attachEvent("onmessage", onGlobalMessage);
         }
 
-        // For non-IE10 modern browsers
         setImmediate = function() {
             var handle = addFromSetImmediateArguments(arguments);
             global.postMessage(messagePrefix + handle, origin);
             return handle;
         };
+    }
 
-    } else if (global.MessageChannel) {
-        // For web workers, where supported
+    function installMessageChannelImplementation() {
         var channel = new global.MessageChannel();
         channel.port1.onmessage = function(event) {
             var handle = event.data;
@@ -116,9 +110,9 @@
             channel.port2.postMessage(handle);
             return handle;
         };
+    }
 
-    } else if (doc && "onreadystatechange" in doc.createElement("script")) {
-        // For IE 6–8
+    function installReadyStateChangeImplementation() {
         var html = doc.documentElement;
         setImmediate = function() {
             var handle = addFromSetImmediateArguments(arguments);
@@ -134,14 +128,40 @@
             html.appendChild(script);
             return handle;
         };
+    }
 
-    } else {
-        // For older browsers
+    function installSetTimeoutImplementation() {
         setImmediate = function() {
             var handle = addFromSetImmediateArguments(arguments);
             global.setTimeout(runIfPresent.bind(undefined, handle), 0);
             return handle;
         };
+    }
+
+    // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
+    var attachTo = Object.getPrototypeOf && Object.getPrototypeOf(global);
+    attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
+
+    // Don't get fooled by e.g. browserify environments.
+    if ({}.toString.call(global.process) === "[object process]") {
+        // For Node.js before 0.9
+        installNextTickImplementation();
+
+    } else if (canUsePostMessage()) {
+        // For non-IE10 modern browsers
+        installPostMessageImplementation();
+
+    } else if (global.MessageChannel) {
+        // For web workers, where supported
+        installMessageChannelImplementation();
+
+    } else if (doc && "onreadystatechange" in doc.createElement("script")) {
+        // For IE 6–8
+        installReadyStateChangeImplementation();
+
+    } else {
+        // For older browsers
+        installSetTimeoutImplementation();
     }
 
     attachTo.setImmediate = setImmediate;
