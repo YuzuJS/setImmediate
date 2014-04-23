@@ -61,12 +61,11 @@
     }
 
     // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
-    var getProto = Object.getPrototypeOf;
-    var attachTo = getProto && getProto(global);
+    var attachTo = Object.getPrototypeOf && Object.getPrototypeOf(global);
     attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
 
     // Don't get fooled by e.g. browserify environments.
-    if (Object.prototype.toString.call(global.process) === "[object process]") {
+    if ({}.toString.call(global.process) === "[object process]") {
         // For Node.js before 0.9
         setImmediate = function() {
             var handle = addFromSetImmediateArguments(arguments);
