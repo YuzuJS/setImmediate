@@ -26,7 +26,7 @@
         if (currentlyRunningATask) {
             // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
             // "too much recursion" error.
-            global.setTimeout(runIfPresent.bind(undefined, handle), 0);
+            setTimeout(runIfPresent.bind(undefined, handle), 0);
         } else {
             var task = tasksByHandle[handle];
             if (task) {
@@ -99,7 +99,7 @@
     }
 
     function installMessageChannelImplementation() {
-        var channel = new global.MessageChannel();
+        var channel = new MessageChannel();
         channel.port1.onmessage = function(event) {
             var handle = event.data;
             runIfPresent(handle);
@@ -133,7 +133,7 @@
     function installSetTimeoutImplementation() {
         setImmediate = function() {
             var handle = addFromSetImmediateArguments(arguments);
-            global.setTimeout(runIfPresent.bind(undefined, handle), 0);
+            setTimeout(runIfPresent.bind(undefined, handle), 0);
             return handle;
         };
     }
