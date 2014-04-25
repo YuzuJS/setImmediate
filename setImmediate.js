@@ -73,10 +73,7 @@
         // * https://developer.mozilla.org/en/DOM/window.postMessage
         // * http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#crossDocumentMessages
 
-        var loc = global.location;
-        var origin = loc && loc.hostname || "*";
         var messagePrefix = "setImmediate$" + Math.random() + "$";
-
         var onGlobalMessage = function(event) {
             if (event.source === global &&
                 typeof event.data === "string" &&
@@ -93,7 +90,7 @@
 
         setImmediate = function() {
             var handle = addFromSetImmediateArguments(arguments);
-            global.postMessage(messagePrefix + handle, origin);
+            global.postMessage(messagePrefix + handle, "*");
             return handle;
         };
     }
