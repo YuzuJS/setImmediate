@@ -8,7 +8,7 @@
 
 ## Introduction
 
-**setImmediate.js** is a highly cross-browser implementation of the `setImmediate` and `clearImmediate` APIs, currently a [W3C draft spec][spec] from the Web Performance Working Group. `setImmediate` allows scripts to yield to the browser, executing a given operation asynchronously, in a manner that is typically more efficient and consumes less power than the usual `setTimeout(..., 0)` pattern.
+**setImmediate.js** is a highly cross-browser implementation of the `setImmediate` and `clearImmediate` APIs, [proposed][spec] by Microsoft to the Web Performance Working Group. `setImmediate` allows scripts to yield to the browser, executing a given operation asynchronously, in a manner that is typically more efficient and consumes less power than the usual `setTimeout(..., 0)` pattern.
 
 setImmediate.js runs at “full speed” in the following browsers and environments, using various clever tricks:
 
