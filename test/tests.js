@@ -37,7 +37,11 @@ specify("Handlers do not execute in the same event loop turn as the call to `set
 specify("Handlers can be strings", function(done) {
     var property = "handler$" + Math.random().toString(36).slice(2);
     done.called = false;
-    global[property] = done;
+    global[property] = function () {
+        delete global[property];
+        done();
+    };
+
     setImmediate(property + ".called = true; " + property + "()");
     assert.strictEqual(done.called, false);
 });
