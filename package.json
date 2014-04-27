@@ -19,7 +19,7 @@
         "test-browser-only": "opener http://localhost:9007/test/browserOnly/index.html && http-server . -p 9007"
     },
     "devDependencies": {
-        "jshint": "~1.1",
+        "jshint": "^2.5.0",
         "mocha": "1.9.x",
         "http-server": "~0.5.3",
         "opener": "~1.3",
