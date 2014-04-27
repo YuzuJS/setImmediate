@@ -21,6 +21,14 @@ setImmediate.js runs at “full speed” in the following browsers and environme
 
 In all other browsers we fall back to using `setTimeout`, so it's always safe to use.
 
+## Macrotasks and Microtasks
+
+The `setImmediate` API, as specified, gives you access to the environment's [task queue][], sometimes known as its "macrotask" queue. This is crucially different from the [microtask queue][] used by web features such as `MutationObserver`, language features such as promises and `Object.observe`, and Node.js features such as `process.nextTick`. Each go-around of the macrotask queue yields back to the event loop once all queued tasks have been processed, even if the macrotask itself queued more macrotasks. Whereas, the microtask queue will continue executing any queued microtasks until it is exhausted.
+
+In practice, what this means is that if you call `setImmediate` inside of another task queued with `setImmediate`, you will yield back to the event loop and any I/O or rendering tasks that need to take place between those calls, instead of executing the queued task as soon as possible.
+
+If you are looking specifically to yield as part of a render loop, consider using [`requestAnimationFrame`][raf]; if you are looking solely for the control-flow ordering effects, use a microtask solution such as [asap][].
+
 ## The Tricks
 
 ### `process.nextTick`
@@ -74,6 +82,10 @@ somewhere early in your app; it attaches to the global.
 
 
 [spec]: https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/setImmediate/Overview.html
+[task queue]: http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#task-queue
+[microtask queue]: http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#perform-a-microtask-checkpoint
+[raf]: www.w3.org/TR/animation-timing/
+[asap]: https://github.com/kriskowal/asap
 [list-post]: http://lists.w3.org/Archives/Public/public-web-perf/2011Jun/0100.html
 [ie-demo]: http://ie.microsoft.com/testdrive/Performance/setImmediateSorting/Default.html
 [ncz]: http://www.nczonline.net/blog/2011/09/19/script-yielding-with-setimmediate/
