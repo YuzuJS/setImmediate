@@ -2,18 +2,15 @@
     "name": "setimmediate",
     "description": "A shim for the setImmediate efficient script yielding API",
     "version": "1.0.1",
-    "author": "NobleJS",
+    "author": "YuzuJS",
     "contributors": [
-        "Domenic Denicola <domenic@domenicdenicola.com> (http://domenicdenicola.com)",
+        "Domenic Denicola <domenic@domenicdenicola.com> (http://domenic.me)",
         "Donavon West <github@donavon.com> (http://donavon.com)",
         "Yaffle"
     ],
     "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/NobleJS/setImmediate.git"
-    },
-    "bugs": "https://github.com/NobleJS/setImmediate/issues",
+    "repository": "git://github.com/YuzuJS/setImmediate.git",
+    "bugs": "https://github.com/YuzuJS/setImmediate/issues",
     "main": "setImmediate.js",
     "scripts": {
         "lint": "jshint setImmediate.js",

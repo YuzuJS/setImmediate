@@ -1,10 +1,10 @@
-<a href="https://ci.testling.com/NobleJS/setImmediate">
-    <img src="https://ci.testling.com/NobleJS/setImmediate.png" alt="Testling-CI badge showing browser compliance"
+<a href="https://ci.testling.com/YuzuJS/setImmediate">
+    <img src="https://ci.testling.com/YuzuJS/setImmediate.png" alt="Testling-CI badge showing browser compliance"
          align="right">
 </a>
 
 # setImmediate.js
-**A NobleJS production**
+**A YuzuJS production**
 
 ## Introduction
 
@@ -77,7 +77,7 @@ somewhere early in your app; it attaches to the global.
 ## Demo
 
 * [Quick sort demo][cross-browser-demo]
- 
+
 ## Reference and Reading
 
  * [Efficient Script Yielding W3C Editor's Draft][spec]
