@@ -24,18 +24,5 @@
         "http-server": "~0.6.1",
         "opener": "^1.3",
         "zuul": "^1.6.4"
-    },
-    "testling": {
-        "browsers": [
-            "ie/6..latest",
-            "firefox/3..5", "firefox/19..nightly",
-            "chrome/4..7", "chrome/24..canary",
-            "opera/10..next",
-            "safari/4..latest",
-            "iphone/6",
-            "ipad/6"
-        ],
-        "harness": "mocha",
-        "files": "test/tests.js"
     }
 }

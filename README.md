@@ -1,8 +1,3 @@
-<a href="https://ci.testling.com/YuzuJS/setImmediate">
-    <img src="https://ci.testling.com/YuzuJS/setImmediate.png" alt="Testling-CI badge showing browser compliance"
-         align="right">
-</a>
-
 # setImmediate.js
 **A YuzuJS production**
 
