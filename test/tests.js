@@ -1,9 +1,6 @@
 "use strict";
 /*global setImmediate: false, clearImmediate: false, specify: false, window: false */
 
-var assert = require("assert");
-require("../setImmediate");
-
 // The Node version of setImmediate does not support string handlers.
 var global = Function("return this")();
 var originalGlobalSetImmediate = global.setImmediate;
@@ -16,6 +13,9 @@ if (originalGlobalSetImmediate) {
         return originalGlobalSetImmediate.apply(this, args);
     };
 }
+
+var assert = require("assert");
+require("../setImmediate");
 
 specify("Handlers do execute", function (done) {
     setImmediate(function () {
@@ -37,12 +37,13 @@ specify("Handlers do not execute in the same event loop turn as the call to `set
 specify("Handlers can be strings", function(done) {
     var property = "handler$" + Math.random().toString(36).slice(2);
     done.called = false;
-    global[property] = function () {
-        delete global[property];
+    setImmediate[property] = function () {
+        delete setImmediate[property];
+
         done();
     };
 
-    setImmediate(property + ".called = true; " + property + "()");
+    setImmediate("setImmediate." + property + ".called = true; setImmediate." + property + "()");
     assert.strictEqual(done.called, false);
 });
 
