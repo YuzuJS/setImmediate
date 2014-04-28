@@ -12,12 +12,19 @@
     var setImmediate;
 
     function addFromSetImmediateArguments(args) {
-        var handler = args[0];
-        args[0] = undefined;
-        tasksByHandle[nextHandle] = typeof handler === "function" ?
-            handler.bind.apply(handler, args) :
-            eval.bind(undefined, "" + handler);
+        tasksByHandle[nextHandle] = curry.apply(undefined, args);
         return nextHandle++;
+    }
+
+    // This function accepts the same arguments as setImmediate, but
+    // returns a function that requires no arguments.
+    function curry(handler) {
+        var args = [].slice.call(arguments, 1);
+        return function() {
+            typeof handler === "function" ?
+                handler.apply(undefined, args) :
+                Function("" + handler)();
+        };
     }
 
     function runIfPresent(handle) {
@@ -26,7 +33,7 @@
         if (currentlyRunningATask) {
             // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
             // "too much recursion" error.
-            setTimeout(runIfPresent.bind(undefined, handle), 0);
+            setTimeout(curry(runIfPresent, handle), 0);
         } else {
             var task = tasksByHandle[handle];
             if (task) {
@@ -48,7 +55,7 @@
     function installNextTickImplementation() {
         setImmediate = function() {
             var handle = addFromSetImmediateArguments(arguments);
-            process.nextTick(runIfPresent.bind(undefined, handle));
+            process.nextTick(curry(runIfPresent, handle));
             return handle;
         };
     }
@@ -130,7 +137,7 @@
     function installSetTimeoutImplementation() {
         setImmediate = function() {
             var handle = addFromSetImmediateArguments(arguments);
-            setTimeout(runIfPresent.bind(undefined, handle), 0);
+            setTimeout(curry(runIfPresent, handle), 0);
             return handle;
         };
     }
