@@ -21,9 +21,11 @@
     function curry(handler) {
         var args = [].slice.call(arguments, 1);
         return function() {
-            typeof handler === "function" ?
-                handler.apply(undefined, args) :
-                Function("" + handler)();
+            if (typeof handler === "function") {
+                handler.apply(undefined, args);
+            } else {
+                (new Function("" + handler))();
+            }
         };
     }
 
