@@ -63,11 +63,12 @@
     }
 
     function canUsePromise() {
-        // Tests for the presence of built-in DOM Promise (living spec as of 29/04/2014)
+        // Tests for the presence of built-in DOM Promise (living spec as of 29/04/2014). As it has many
+        // polyfills available, we double check that this is natively supported.
         if (typeof global.Promise === "function") {
-            var promise = new Promise(function() {});
-            var isThenable = typeof promise.then === "function";
-            return isThenable;
+            var source = Function.prototype.toString.call(global.Promise);
+            var isNative = source.indexOf("[native code]") !== -1;
+            return isNative;
         }
     }
 
