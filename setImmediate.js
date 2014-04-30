@@ -62,6 +62,15 @@
         };
     }
 
+    function canUsePromise() {
+        // Tests for the presence of built-in DOM Promise (living spec as of 29/04/2014)
+        if (typeof global.Promise === "function") {
+            var promise = new Promise(function() {});
+            var isThenable = typeof promise.then === "function";
+            return isThenable;
+        }
+    }
+
     function canUsePostMessage() {
         // The test against `importScripts` prevents this implementation from being installed inside a web worker,
         // where `global.postMessage` means something completely different and can't be used for this purpose.
@@ -74,6 +83,15 @@
             global.postMessage("", "*");
             global.onmessage = oldOnMessage;
             return postMessageIsAsynchronous;
+        }
+    }
+
+    function installPromiseImplementation() {
+        setImmediate = function() {
+            var handle = addFromSetImmediateArguments(arguments);
+            var promise = new Promise(function(resolve) { resolve(); });
+            promise.then(partiallyApplied(runIfPresent, handle));
+            return handle;
         }
     }
 
@@ -152,6 +170,10 @@
     if ({}.toString.call(global.process) === "[object process]") {
         // For Node.js before 0.9
         installNextTickImplementation();
+
+    } else if (canUsePromise()) {
+        // For Chrome 32+ and Firefox 29+
+        installPromiseImplementation();
 
     } else if (canUsePostMessage()) {
         // For non-IE10 modern browsers
