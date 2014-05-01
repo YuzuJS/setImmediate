@@ -28,7 +28,9 @@ If you are looking specifically to yield as part of a render loop, consider usin
 
 ### `process.nextTick`
 
-In Node.js versions below 0.9, `setImmediate` is not available, but [`process.nextTick`][nextTIck] is, so we use it to shim support for a global `setImmediate`. In Node.js 0.9 and above, `setImmediate` is available.
+In Node.js versions below 0.9, `setImmediate` is not available, but [`process.nextTick`][nextTick] is—and in those versions, `process.nextTick` uses macrotask semantics. So, we use it to shim support for a global `setImmediate`.
+
+In Node.js 0.9 and above, `process.nextTick` moved to microtask semantics, but `setImmediate` was introduced with macrotask semantics, so there's no need to polyfill anything.
 
 Note that we check for *actual* Node.js environments, not emulated ones like those produced by browserify or similar. Such emulated environments often already include a `process.nextTick` shim that's not as browser-compatible as setImmediate.js.
 
