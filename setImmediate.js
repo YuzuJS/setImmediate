@@ -1,7 +1,28 @@
 (function (global, undefined) {
     "use strict";
 
+    // Also exporting the functions for direct access via AMD and CommonJS
+    function exportAsModule() {
+        var expose = {
+            setImmediate: global.setImmediate,
+            clearImmediate: global.clearImmediate
+        };
+
+        if (typeof define === "function" && define.amd) {
+            // AMD. Register as an anonymous module.
+            define(function () {
+                return expose;
+            });
+        } else if (typeof exports === "object") {
+            // Node. Does not work with strict CommonJS, but
+            // only CommonJS-like enviroments that support module.exports,
+            // like Node.
+            module.exports = expose;
+        }
+    }
+
     if (global.setImmediate) {
+        exportAsModule();
         return;
     }
 
@@ -172,4 +193,6 @@
 
     attachTo.setImmediate = setImmediate;
     attachTo.clearImmediate = clearImmediate;
+    exportAsModule();
+
 }(new Function("return this")()));

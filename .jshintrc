@@ -16,6 +16,7 @@
     "unused": true,
     "white": true,
     "globals": {
-        "MessageChannel": false
+        "MessageChannel": false,
+        "define": false
     }
 }
