@@ -64,7 +64,16 @@ then
 require("setimmediate");
 ```
 
-somewhere early in your app; it attaches to the global.
+somewhere early in your app; it exports `setImmediate` and `clearImmediate` and also attaches them to the global:
+
+```js
+var exported = require("setimmediate");
+
+typeof setImmediate; // 'function'
+typeof clearImmediate; // 'function'
+typeof exported.setImmediate; // 'function'
+typeof exported.clearImmediate; // 'function'
+```
 
 ## Demo
 

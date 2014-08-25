@@ -15,7 +15,7 @@ if (originalGlobalSetImmediate) {
 }
 
 var assert = require("assert");
-require("../setImmediate");
+var exported = require("../setImmediate");
 
 specify("Handlers do execute", function (done) {
     setImmediate(function () {
@@ -103,4 +103,9 @@ specify("`clearImmediate` does not interfere with handlers other than the one wi
         assert.deepEqual(recordedArgs, expectedArgs);
         done();
     }, 100);
+});
+
+specify("`setImmediate` and `clearImmediate` should be exported by the module", function () {
+    assert.equal(exported.setImmediate, setImmediate);
+    assert.equal(exported.clearImmediate, clearImmediate);
 });
