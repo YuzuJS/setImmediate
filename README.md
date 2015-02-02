@@ -81,7 +81,7 @@ somewhere early in your app; it attaches to the global.
 [spec]: https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/setImmediate/Overview.html
 [task queue]: http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#task-queue
 [microtask queue]: http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#perform-a-microtask-checkpoint
-[raf]: http://www.w3.org/TR/animation-timing/
+[raf]: https://html.spec.whatwg.org/multipage/webappapis.html#dom-window-requestanimationframe
 [asap]: https://github.com/kriskowal/asap
 [list-post]: http://lists.w3.org/Archives/Public/public-web-perf/2011Jun/0100.html
 [ie-demo]: http://ie.microsoft.com/testdrive/Performance/setImmediateSorting/Default.html
