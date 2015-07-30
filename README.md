@@ -44,9 +44,9 @@ Note that Internet Explorer 8 includes a synchronous version of `postMessage`. W
 
 Unfortunately, `postMessage` has completely different semantics inside web workers, and so cannot be used there. So we turn to [`MessageChannel`][MessageChannel], which has worse browser support, but does work inside a web worker.
 
-### `<script> onreadystatechange`
+### `<img> onerror`
 
-For our last trick, we pull something out to make things fast in Internet Explorer versions 6 through 8: namely, creating a `<script>` element and firing our calls in its `onreadystatechange` event. This does execute in a future turn of the event loop, and is also faster than `setTimeout(…, 0)`, so hey, why not?
+For our last trick, we pull something out to make things fast in Internet Explorer versions 6 through 8: namely, creating a `<img>` element with an invalid `src`, and firing our calls in its `onerror` event. This does execute in a future turn of the event loop, and is also faster than `setTimeout(…, 0)`, so hey, why not?
 
 ## Usage
 

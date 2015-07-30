@@ -118,20 +118,18 @@
         };
     }
 
-    function installReadyStateChangeImplementation() {
-        var html = doc.documentElement;
+    function installImageImplementation() {
         setImmediate = function() {
             var handle = addFromSetImmediateArguments(arguments);
-            // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
-            // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
-            var script = doc.createElement("script");
-            script.onreadystatechange = function () {
+            var image = new global.Image();
+
+            image.onerror = function() {
                 runIfPresent(handle);
-                script.onreadystatechange = null;
-                html.removeChild(script);
-                script = null;
             };
-            html.appendChild(script);
+
+            // This will always cause an error event to fire.
+            image.src = "\0";
+
             return handle;
         };
     }
@@ -161,12 +159,12 @@
         // For web workers, where supported
         installMessageChannelImplementation();
 
-    } else if (doc && "onreadystatechange" in doc.createElement("script")) {
-        // For IE 6–8
-        installReadyStateChangeImplementation();
+    } else if (doc && global.Image) {
+        // For IE 6–8, maybe older browsers
+        installImageImplementation();
 
     } else {
-        // For older browsers
+        // Ultimate fallback
         installSetTimeoutImplementation();
     }
 
