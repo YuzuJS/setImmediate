@@ -144,7 +144,7 @@
             // This solution is an non-intrusive alternative to the <script> solution,
             // because it doesn't need to be embedded to the document
         
-            var image = new Image();
+            var image = new global.Image();
             
             image.onload = image.onerror = function () {
                 runIfPresent(handle);
