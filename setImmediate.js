@@ -117,30 +117,12 @@
             return handle;
         };
     }
-
-    function installImageImplementation() {
-        var src = 'data:image/gif;base64,R0lGODlhAQABAAAAACw=';
-        setImmediate = function() {
-            var handle = addFromSetImmediateArguments(arguments);
-            // Create an <image> element; its load event will be fired asynchronously
-        
-            var image = new Image();
-            
-            image.onload = function () {
-                runIfPresent(handle);
-            };
-            
-            image.src = src;
-            
-            return handle;
-        };
-    }
     
     function installImageImplementation() {
         var src = 'data:image/gif;base64,R0lGODlhAQABAAAAACw=';
         setImmediate = function() {
             var handle = addFromSetImmediateArguments(arguments);
-            // Create an <image> element; its load/error event will be fired asynchronously
+            // Create an <img> element; its load/error event will be fired asynchronously
             // This solution is an non-intrusive alternative to the <script> solution,
             // because it doesn't need to be embedded to the document
         
