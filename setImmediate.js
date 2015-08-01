@@ -120,7 +120,7 @@
     
     function installImageImplementation() {
         // works with a data URL but why use it? a forbidden character is enough
-        // to always the error event
+        // to always fire the error event
         var src = '\0';
         setImmediate = function() {
             var handle = addFromSetImmediateArguments(arguments);
