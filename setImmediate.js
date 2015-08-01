@@ -119,16 +119,18 @@
     }
     
     function installImageImplementation() {
-        var src = 'data:image/gif;base64,R0lGODlhAQABAAAAACw=';
+        // works with a data URL but why use it? a forbidden character is enough
+        // to always the error event
+        var src = '\0';
         setImmediate = function() {
             var handle = addFromSetImmediateArguments(arguments);
-            // Create an <img> element; its load/error event will be fired asynchronously
+            // Create an <img> element; its error event will be fired asynchronously
             // This solution is an non-intrusive alternative to the <script> solution,
             // because it doesn't need to be embedded to the document
         
             var image = new global.Image();
             
-            image.onload = image.onerror = function () {
+            image.onerror = function () {
                 runIfPresent(handle);
             };
             
