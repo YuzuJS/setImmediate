@@ -173,4 +173,4 @@
     attachTo.setImmediate = setImmediate;
     attachTo.clearImmediate = clearImmediate;
 }
-(typeof window == 'undefined' ? typeof global == 'undefined' ? this : global : window));
+(typeof self == 'undefined' ? typeof global == 'undefined' ? this : global : self));
