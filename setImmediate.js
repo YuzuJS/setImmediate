@@ -172,4 +172,9 @@
 
     attachTo.setImmediate = setImmediate;
     attachTo.clearImmediate = clearImmediate;
-}(new Function("return this")()));
+}
+(typeof self == "undefined" ? typeof global == "undefined"
+    ? this
+    : global
+    : self
+));
