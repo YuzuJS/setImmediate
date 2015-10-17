@@ -142,10 +142,6 @@
         };
     }
 
-    // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
-    var attachTo = Object.getPrototypeOf && Object.getPrototypeOf(global);
-    attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
-
     // Don't get fooled by e.g. browserify environments.
     if ({}.toString.call(global.process) === "[object process]") {
         // For Node.js before 0.9
@@ -168,6 +164,38 @@
         installSetTimeoutImplementation();
     }
 
-    attachTo.setImmediate = setImmediate;
-    attachTo.clearImmediate = clearImmediate;
+    function toGlobal() {
+        // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
+        var attachTo = Object.getPrototypeOf && Object.getPrototypeOf(global);
+        attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
+
+        attachTo.setImmediate   = setImmediate;
+        attachTo.clearImmediate = clearImmediate;
+    }
+
+    // AMD
+    if ( typeof define == 'function' && define.amd ) {
+        define([], function () {
+            // Don't touch global unless wanted!
+            return {
+                setImmediate  : setImmediate,
+                clearImmediate: clearImmediate,
+                toGlobal: toGlobal
+            };
+        });
+    }
+    else {
+        // CommonJs
+        if ( typeof module != 'undefined' && module.exports ) {
+            exports.setImmediate = setImmediate;
+            exports.clearImmediate = clearImmediate;
+
+            toGlobal(); // export to global of let user choose?
+            // exports.toGlobal = toGlobal;
+        }
+        else {
+            toGlobal();
+        }
+    }
+
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
