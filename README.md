@@ -55,16 +55,15 @@ In the browser, include it with a `<script>` tag; pretty simple.
 In Node.js, do
 
 ```
-npm install setimmediate
+npm install --save setimmediate
 ```
 
 then
 
 ```js
-require("setimmediate");
+require("setimmediate");  // (somewhere early in your app; it attaches to the global scope.)
 ```
 
-somewhere early in your app; it attaches to the global.
 
 ## Demo
 
