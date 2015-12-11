@@ -2,6 +2,12 @@
     "use strict";
 
     if (global.setImmediate) {
+        if (module) {
+            module.exports = {
+                setImmediate: global.setImmediate,
+                clearImmediate: global.clearImmediate
+            };
+        }
         return;
     }
 
@@ -172,4 +178,11 @@
 
     attachTo.setImmediate = setImmediate;
     attachTo.clearImmediate = clearImmediate;
+
+    if (module) {
+        module.exports = {
+            setImmediate: setImmediate,
+            clearImmediate: clearImmediate
+        };
+    }
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
