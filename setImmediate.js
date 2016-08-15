@@ -9,24 +9,49 @@
     var tasksByHandle = {};
     var currentlyRunningATask = false;
     var doc = global.document;
-    var setImmediate;
+    var registerImmediate;
 
-    function addFromSetImmediateArguments(args) {
-        tasksByHandle[nextHandle] = partiallyApplied.apply(undefined, args);
-        return nextHandle++;
+    function setImmediate(callback) {
+      // Callback can either be a function or a string
+      if (typeof callback !== "function") {
+        callback = new Function("" + callback);
+      }
+      // Copy function arguments
+      var args = new Array(arguments.length - 1);
+      for (var i = 0; i < args.length; i++) {
+          args[i] = arguments[i + 1];
+      }
+      // Store and register the task
+      var task = { callback: callback, args: args };
+      tasksByHandle[nextHandle] = task;
+      registerImmediate(nextHandle);
+      return nextHandle++;
     }
 
-    // This function accepts the same arguments as setImmediate, but
-    // returns a function that requires no arguments.
-    function partiallyApplied(handler) {
-        var args = [].slice.call(arguments, 1);
-        return function() {
-            if (typeof handler === "function") {
-                handler.apply(undefined, args);
-            } else {
-                (new Function("" + handler))();
-            }
-        };
+    function clearImmediate(handle) {
+        delete tasksByHandle[handle];
+    }
+
+    function run(task) {
+        var callback = task.callback;
+        var args = task.args;
+        switch (args.length) {
+        case 0:
+            callback();
+            break;
+        case 1:
+            callback(args[0]);
+            break;
+        case 2:
+            callback(args[0], args[1]);
+            break;
+        case 3:
+            callback(args[0], args[1], args[2]);
+            break;
+        default:
+            callback.apply(undefined, args);
+            break;
+        }
     }
 
     function runIfPresent(handle) {
@@ -35,13 +60,13 @@
         if (currentlyRunningATask) {
             // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
             // "too much recursion" error.
-            setTimeout(partiallyApplied(runIfPresent, handle), 0);
+            setTimeout(runIfPresent, 0, handle);
         } else {
             var task = tasksByHandle[handle];
             if (task) {
                 currentlyRunningATask = true;
                 try {
-                    task();
+                    run(task);
                 } finally {
                     clearImmediate(handle);
                     currentlyRunningATask = false;
@@ -50,15 +75,9 @@
         }
     }
 
-    function clearImmediate(handle) {
-        delete tasksByHandle[handle];
-    }
-
     function installNextTickImplementation() {
-        setImmediate = function() {
-            var handle = addFromSetImmediateArguments(arguments);
-            process.nextTick(partiallyApplied(runIfPresent, handle));
-            return handle;
+        registerImmediate = function(handle) {
+            process.nextTick(function () { runIfPresent(handle); });
         };
     }
 
@@ -97,10 +116,8 @@
             global.attachEvent("onmessage", onGlobalMessage);
         }
 
-        setImmediate = function() {
-            var handle = addFromSetImmediateArguments(arguments);
+        registerImmediate = function(handle) {
             global.postMessage(messagePrefix + handle, "*");
-            return handle;
         };
     }
 
@@ -111,17 +128,14 @@
             runIfPresent(handle);
         };
 
-        setImmediate = function() {
-            var handle = addFromSetImmediateArguments(arguments);
+        registerImmediate = function(handle) {
             channel.port2.postMessage(handle);
-            return handle;
         };
     }
 
     function installReadyStateChangeImplementation() {
         var html = doc.documentElement;
-        setImmediate = function() {
-            var handle = addFromSetImmediateArguments(arguments);
+        registerImmediate = function(handle) {
             // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
             // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
             var script = doc.createElement("script");
@@ -132,15 +146,12 @@
                 script = null;
             };
             html.appendChild(script);
-            return handle;
         };
     }
 
     function installSetTimeoutImplementation() {
-        setImmediate = function() {
-            var handle = addFromSetImmediateArguments(arguments);
-            setTimeout(partiallyApplied(runIfPresent, handle), 0);
-            return handle;
+        registerImmediate = function(handle) {
+            setTimeout(runIfPresent, 0, handle);
         };
     }
 
