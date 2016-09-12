@@ -11,6 +11,9 @@
     "license": "MIT",
     "repository": "YuzuJS/setImmediate",
     "main": "setImmediate.js",
+    "files": [
+        "setImmediate.js"
+    ],
     "scripts": {
         "lint": "jshint setImmediate.js",
         "test": "mocha test/tests.js",
