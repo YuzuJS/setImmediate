@@ -164,13 +164,13 @@
         // For Node.js before 0.9
         installNextTickImplementation();
 
-    } else if (canUsePostMessage()) {
-        // For non-IE10 modern browsers
-        installPostMessageImplementation();
-
     } else if (global.MessageChannel) {
-        // For web workers, where supported
+        // For web workers and modern browsers (where supported)
         installMessageChannelImplementation();
+
+    } else if (canUsePostMessage()) {
+        // For other modern browsers (e.g. Firefox)
+        installPostMessageImplementation();
 
     } else if (doc && "onreadystatechange" in doc.createElement("script")) {
         // For IE 6–8
