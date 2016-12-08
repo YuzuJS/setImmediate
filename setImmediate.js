@@ -84,7 +84,7 @@
     function canUsePostMessage() {
         // The test against `importScripts` prevents this implementation from being installed inside a web worker,
         // where `global.postMessage` means something completely different and can't be used for this purpose.
-        if (global.postMessage && !global.importScripts) {
+        if (global.postMessage && !global.importScripts && !(global.port && global.port.emit)) {
             var postMessageIsAsynchronous = true;
             var oldOnMessage = global.onmessage;
             global.onmessage = function() {
@@ -183,4 +183,4 @@
 
     attachTo.setImmediate = setImmediate;
     attachTo.clearImmediate = clearImmediate;
-}(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
+}(typeof self === "undefined" || !Object.isExtensible(self) ? typeof global === "undefined" || !Object.isExtensible(global) ? this : global : self));
