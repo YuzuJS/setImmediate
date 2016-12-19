@@ -1,0 +1,11 @@
+{
+    "name": "setimmediate",
+    "version": "1.0.1",
+    "main": "setImmediate.js",
+    "ignore": [
+        ".*",
+        "package.json",
+        "qUnitTest/",
+        "test/"
+    ]
+}
