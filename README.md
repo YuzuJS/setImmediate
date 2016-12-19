@@ -34,6 +34,12 @@ In Node.js 0.9 and above, `process.nextTick` moved to microtask semantics, but `
 
 Note that we check for *actual* Node.js environments, not emulated ones like those produced by browserify or similar. Such emulated environments often already include a `process.nextTick` shim that's not as browser-compatible as setImmediate.js.
 
+### `Promise`
+
+In Chrome 32+ and Firefox 29+ (25+ using a flag), [`Promise`][Promise] is available. Any callbacks attached to a resolved Promise will get invoked at the end of the current iteration of the event loop.
+
+Note that `Promise` has many polyfills, so we look at its definition to determine whether it is natively available or not.
+
 ### `postMessage`
 
 In Firefox 3+, Internet Explorer 9+, all modern WebKit browsers, and Opera 9.5+, [`postMessage`][postMessage] is available and provides a good way to queue tasks on the event loop. It's quite the abuse, using a cross-document messaging protocol within the same document simply to get access to the event loop task queue, but until there are native implementations, this is the best option.
@@ -86,6 +92,7 @@ require("setimmediate");  // (somewhere early in your app; it attaches to the gl
 [ie-demo]: http://ie.microsoft.com/testdrive/Performance/setImmediateSorting/Default.html
 [ncz]: http://www.nczonline.net/blog/2011/09/19/script-yielding-with-setimmediate/
 [nextTick]: http://nodejs.org/docs/v0.8.16/api/process.html#process_process_nexttick_callback
+[Promise]: https://github.com/domenic/promises-unwrapping
 [postMessage]: http://www.whatwg.org/specs/web-apps/current-work/multipage/web-messaging.html#posting-messages
 [MessageChannel]: http://www.whatwg.org/specs/web-apps/current-work/multipage/web-messaging.html#channel-messaging
 [cross-browser-demo]: http://jphpsf.github.com/setImmediate-shim-demo
