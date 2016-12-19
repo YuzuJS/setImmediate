@@ -15,7 +15,7 @@ if (originalGlobalSetImmediate) {
 }
 
 var assert = require("assert");
-require("../setImmediate");
+var sI = require("../setImmediate");
 
 specify("Handlers do execute", function (done) {
     setImmediate(function () {
@@ -103,4 +103,10 @@ specify("`clearImmediate` does not interfere with handlers other than the one wi
         assert.deepEqual(recordedArgs, expectedArgs);
         done();
     }, 100);
+});
+
+specify("Returns an object with proper functions.", function() {
+    assert(typeof sI === "object")
+    assert(typeof sI.setImmediate === "function");
+    assert(typeof sI.clearImmediate === "function");
 });
