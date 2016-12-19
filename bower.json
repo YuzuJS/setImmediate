@@ -1,0 +1,16 @@
+{
+    "name": "setimmediate",
+    "description": "A shim for the setImmediate efficient script yielding API",
+    "version": "1.0.2",
+    "main": "setImmediate.js",
+    "license": "MIT",
+    "author": "YuzuJS",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/YuzuJS/setImmediate.git"
+    },
+    "ignore": [
+        "package.json",
+        "test"
+    ]
+}
