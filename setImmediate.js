@@ -155,6 +155,14 @@
         };
     }
 
+    function installRequestIdleCallbackImplementation() {
+        registerImmediate = function(handle) {
+            // 500 is a 'magic number' here, just to guarantee execution,
+            // can be removed but in this case it runs later/slower than native setImmediate in Edge
+            requestIdleCallback(function() { runIfPresent(handle) }, { timeout: 500 });
+        };
+    }
+
     // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
     var attachTo = Object.getPrototypeOf && Object.getPrototypeOf(global);
     attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
@@ -163,6 +171,10 @@
     if ({}.toString.call(global.process) === "[object process]") {
         // For Node.js before 0.9
         installNextTickImplementation();
+
+    } else if(global.requestIdleCallback) {
+        // For Chrome 47+ Opera 34+, Firefox 52+
+        installRequestIdleCallbackImplementation();
 
     } else if (canUsePostMessage()) {
         // For non-IE10 modern browsers
