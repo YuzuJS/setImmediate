@@ -81,6 +81,12 @@
         };
     }
 
+    function installPromiseImplementation() {
+        registerImmediate = function(handle) {
+            Promise.resolve(handle).then(runIfPresent);
+        };
+    }
+
     function canUsePostMessage() {
         // The test against `importScripts` prevents this implementation from being installed inside a web worker,
         // where `global.postMessage` means something completely different and can't be used for this purpose.
@@ -163,6 +169,10 @@
     if ({}.toString.call(global.process) === "[object process]") {
         // For Node.js before 0.9
         installNextTickImplementation();
+
+    } else if (global.Promise) {
+        // For modern browsers
+        installPromiseImplementation();
 
     } else if (canUsePostMessage()) {
         // For non-IE10 modern browsers
