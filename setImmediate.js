@@ -172,7 +172,7 @@
         // For web workers, where supported
         installMessageChannelImplementation();
 
-    } else if (doc && "onreadystatechange" in doc.createElement("script")) {
+    } else if (doc && doc.createElement && "onreadystatechange" in doc.createElement("script")) {
         // For IE 6–8
         installReadyStateChangeImplementation();
 
