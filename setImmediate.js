@@ -1,7 +1,7 @@
 (function (global, undefined) {
     "use strict";
 
-    if (global.setImmediate) {
+    if (global.setImmediate && global.clearImmediate) {
         return;
     }
 
