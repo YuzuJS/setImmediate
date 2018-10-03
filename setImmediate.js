@@ -95,6 +95,23 @@
             return postMessageIsAsynchronous;
         }
     }
+    function canUsePromiseResolveThen() {
+        // test promises
+        if (global.Promise && global.Promise.resolve) {
+            var promiseThenAsync = true;
+            global.Promise.resolve(false)
+              .then(function(arg) {promiseThenAsync = arg});
+            return promiseThenAsync;
+        }
+    }
+    
+    function installPromiseResolveThenImplementation() {
+        registerImmediate = function(handle) {
+            // thenable is always faster without any wrappings
+            global.Promise.resolve(handle).then(runIfPresent);
+        };
+    }
+
 
     function installPostMessageImplementation() {
         // Installs an event handler on `global` for the `message` event: see
@@ -163,6 +180,9 @@
     if ({}.toString.call(global.process) === "[object process]") {
         // For Node.js before 0.9
         installNextTickImplementation();
+    } else if (canUsePromiseResolveThen()) {
+        // For fairly modern browsers
+        installPromiseResolveThenImplementation();
 
     } else if (canUsePostMessage()) {
         // For non-IE10 modern browsers
