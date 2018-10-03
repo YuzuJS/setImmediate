@@ -98,16 +98,17 @@
     function canUsePromiseResolveThen() {
         // test promises
         if (global.Promise && global.Promise.resolve) {
-            var promiseThenAsync = true
-            Promise.resolve(false).then(function(arg) {promiseThenAsync = arg})
-            return promiseThenAsync
+            var promiseThenAsync = true;
+            global.Promise.resolve(false)
+              .then(function(arg) {promiseThenAsync = arg});
+            return promiseThenAsync;
         }
     }
     
     function installPromiseResolveThenImplementation() {
         registerImmediate = function(handle) {
             // thenable is always faster without any wrappings
-            Promise.resolve(handle).then(runIfPresent);
+            global.Promise.resolve(handle).then(runIfPresent);
         };
     }
 
@@ -181,7 +182,7 @@
         installNextTickImplementation();
     } else if (canUsePromiseResolveThen()) {
         // For fairly modern browsers
-        installPromiseResolveThenImplementation()
+        installPromiseResolveThenImplementation();
 
     } else if (canUsePostMessage()) {
         // For non-IE10 modern browsers
