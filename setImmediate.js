@@ -96,6 +96,17 @@
         }
     }
 
+    function startsWith(string, value) {
+        for (var index = 0; index < value.length; index++) {
+            var stringChar = string[index]
+            var valueChar = value[index]
+
+            if (stringChar !== valueChar) return false
+        }
+
+        return true
+    }
+
     function installPostMessageImplementation() {
         // Installs an event handler on `global` for the `message` event: see
         // * https://developer.mozilla.org/en/DOM/window.postMessage
@@ -105,7 +116,7 @@
         var onGlobalMessage = function(event) {
             if (event.source === global &&
                 typeof event.data === "string" &&
-                event.data.indexOf(messagePrefix) === 0) {
+                startsWith(event.data, messagePrefix)) {
                 runIfPresent(+event.data.slice(messagePrefix.length));
             }
         };
