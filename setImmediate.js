@@ -106,11 +106,7 @@
             }
         };
 
-        if (global.addEventListener) {
-            global.addEventListener("message", onGlobalMessage, false);
-        } else {
-            global.attachEvent("onmessage", onGlobalMessage);
-        }
+        global.addEventListener("message", onGlobalMessage, false);
 
         registerImmediate = function(handle) {
             global.postMessage(messagePrefix + handle, "*");
@@ -129,22 +125,6 @@
         };
     }
 
-    function installReadyStateChangeImplementation() {
-        var html = doc.documentElement;
-        registerImmediate = function(handle) {
-            // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
-            // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
-            var script = doc.createElement("script");
-            script.onreadystatechange = function () {
-                runIfPresent(handle);
-                script.onreadystatechange = null;
-                html.removeChild(script);
-                script = null;
-            };
-            html.appendChild(script);
-        };
-    }
-
     function installSetTimeoutImplementation() {
         registerImmediate = function(handle) {
             setTimeout(runIfPresent, 0, handle);
@@ -160,17 +140,13 @@
         // For Node.js before 0.9
         installNextTickImplementation();
 
-    } else if (canUsePostMessage()) {
+    } else if (canUsePostMessage() && global.addEventListener) {
         // For non-IE10 modern browsers
         installPostMessageImplementation();
 
     } else if (global.MessageChannel) {
         // For web workers, where supported
         installMessageChannelImplementation();
-
-    } else if (doc && "onreadystatechange" in doc.createElement("script")) {
-        // For IE 6–8
-        installReadyStateChangeImplementation();
 
     } else {
         // For older browsers
