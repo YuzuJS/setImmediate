@@ -6,30 +6,25 @@
     }
 
     var nextHandle = 1; // Spec says greater than zero
-    var tasksByHandle = {};
+    var tasksByHandle = new Map();
     var currentlyRunningATask = false;
     var doc = global.document;
     var registerImmediate;
 
-    function setImmediate(callback) {
+    function setImmediate(callback, ...args) {
       // Callback can either be a function or a string
       if (typeof callback !== "function") {
         callback = new Function("" + callback);
       }
-      // Copy function arguments
-      var args = new Array(arguments.length - 1);
-      for (var i = 0; i < args.length; i++) {
-          args[i] = arguments[i + 1];
-      }
       // Store and register the task
       var task = { callback: callback, args: args };
-      tasksByHandle[nextHandle] = task;
+      tasksByHandle.set(nextHandle, task);
       registerImmediate(nextHandle);
       return nextHandle++;
     }
 
     function clearImmediate(handle) {
-        delete tasksByHandle[handle];
+        tasksByHandle.delete(handle);
     }
 
     function run(task) {
@@ -62,7 +57,7 @@
             // "too much recursion" error.
             setTimeout(runIfPresent, 0, handle);
         } else {
-            var task = tasksByHandle[handle];
+            var task = tasksByHandle.get(handle);
             if (task) {
                 currentlyRunningATask = true;
                 try {
@@ -103,18 +98,15 @@
 
         var messagePrefix = "setImmediate$" + Math.random() + "$";
         var onGlobalMessage = function(event) {
-            if (event.source === global &&
-                typeof event.data === "string" &&
-                event.data.indexOf(messagePrefix) === 0) {
-                runIfPresent(+event.data.slice(messagePrefix.length));
+            if (event.source === global) {
+                var data = event.data;
+                if (typeof data === "string" && data.startsWith(messagePrefix)) {
+                    runIfPresent(+data.slice(messagePrefix.length));
+                }
             }
         };
 
-        if (global.addEventListener) {
-            global.addEventListener("message", onGlobalMessage, false);
-        } else {
-            global.attachEvent("onmessage", onGlobalMessage);
-        }
+        global.addEventListener("message", onGlobalMessage, false);
 
         registerImmediate = function(handle) {
             global.postMessage(messagePrefix + handle, "*");
@@ -133,22 +125,6 @@
         };
     }
 
-    function installReadyStateChangeImplementation() {
-        var html = doc.documentElement;
-        registerImmediate = function(handle) {
-            // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
-            // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
-            var script = doc.createElement("script");
-            script.onreadystatechange = function () {
-                runIfPresent(handle);
-                script.onreadystatechange = null;
-                html.removeChild(script);
-                script = null;
-            };
-            html.appendChild(script);
-        };
-    }
-
     function installSetTimeoutImplementation() {
         registerImmediate = function(handle) {
             setTimeout(runIfPresent, 0, handle);
@@ -164,17 +140,13 @@
         // For Node.js before 0.9
         installNextTickImplementation();
 
-    } else if (canUsePostMessage()) {
+    } else if (canUsePostMessage() && global.addEventListener) {
         // For non-IE10 modern browsers
         installPostMessageImplementation();
 
     } else if (global.MessageChannel) {
         // For web workers, where supported
         installMessageChannelImplementation();
-
-    } else if (doc && "onreadystatechange" in doc.createElement("script")) {
-        // For IE 6–8
-        installReadyStateChangeImplementation();
 
     } else {
         // For older browsers
