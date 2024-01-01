@@ -6,7 +6,7 @@
     }
 
     var nextHandle = 1; // Spec says greater than zero
-    var tasksByHandle = {};
+    var tasksByHandle = new Map();
     var currentlyRunningATask = false;
     var doc = global.document;
     var registerImmediate;
@@ -18,13 +18,13 @@
       }
       // Store and register the task
       var task = { callback: callback, args: args };
-      tasksByHandle[nextHandle] = task;
+      tasksByHandle.set(nextHandle, task);
       registerImmediate(nextHandle);
       return nextHandle++;
     }
 
     function clearImmediate(handle) {
-        delete tasksByHandle[handle];
+        tasksByHandle.delete(handle);
     }
 
     function run(task) {
@@ -57,7 +57,7 @@
             // "too much recursion" error.
             setTimeout(runIfPresent, 0, handle);
         } else {
-            var task = tasksByHandle[handle];
+            var task = tasksByHandle.get(handle);
             if (task) {
                 currentlyRunningATask = true;
                 try {
