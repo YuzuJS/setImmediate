@@ -98,10 +98,11 @@
 
         var messagePrefix = "setImmediate$" + Math.random() + "$";
         var onGlobalMessage = function(event) {
-            if (event.source === global &&
-                typeof event.data === "string" &&
-                event.data.indexOf(messagePrefix) === 0) {
-                runIfPresent(+event.data.slice(messagePrefix.length));
+            if (event.source === global) {
+                var data = event.data;
+                if (typeof data === "string" && data.startsWith(messagePrefix)) {
+                    runIfPresent(+data.slice(messagePrefix.length));
+                }
             }
         };
 
